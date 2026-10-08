@@ -1,0 +1,1619 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HireLoop prototype</title>
+<meta name="description" content="HireLoop — interactive product prototype.">
+<meta name="theme-color" content="#0B6E5F" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#10161B" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://kushajjee-tech.github.io/hireloop-prototype/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230B6E5F'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='16' font-weight='700' fill='white' text-anchor='middle'%3EHL%3C/text%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:title" content="HireLoop prototype">
+<meta property="og:description" content="HireLoop — interactive product prototype.">
+<meta property="og:url" content="https://kushajjee-tech.github.io/hireloop-prototype/">
+<meta name="twitter:card" content="summary">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F2F4F1;--surface:#FFFFFF;--surface-2:#E9EDE9;--ink:#16212B;--muted:#56636E;--line:#D5DBD6;
+  --brand:#0B6E5F;--brand-ink:#FFFFFF;
+  --agent:#4A4EC0;--team:#0B6E5F;--company:#2B5A86;--hm:#8A3B77;--cand:#2C7A47;
+  --warn:#9A6210;--bad:#B23A3A;--good:#2C7A47;--focus:#4A4EC0;
+  --rail:#16212B;--rail-ink:#E6ECEF;--rail-muted:#9AA8B3;--rail-hover:#223140;
+  --slack-side:#2A2338;--slack-ink:#EDE7F3;--slack-muted:#B6A9C6;
+  color-scheme:light;box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#10161B;--surface:#172028;--surface-2:#1F2A33;--ink:#E6ECEF;--muted:#9AA8B3;--line:#2B3842;
+    --brand:#3CB49E;--brand-ink:#06201B;
+    --agent:#9497F2;--team:#3CB49E;--company:#7FB1E0;--hm:#D78EC6;--cand:#6CC48D;
+    --warn:#E3AA4C;--bad:#F07C7C;--good:#6CC48D;--focus:#9497F2;
+    --rail:#0B1014;--rail-ink:#E6ECEF;--rail-muted:#8C99A4;--rail-hover:#1A242D;
+    --slack-side:#1C1726;color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10161B;--surface:#172028;--surface-2:#1F2A33;--ink:#E6ECEF;--muted:#9AA8B3;--line:#2B3842;
+  --brand:#3CB49E;--brand-ink:#06201B;
+  --agent:#9497F2;--team:#3CB49E;--company:#7FB1E0;--hm:#D78EC6;--cand:#6CC48D;
+  --warn:#E3AA4C;--bad:#F07C7C;--good:#6CC48D;--focus:#9497F2;
+  --rail:#0B1014;--rail-ink:#E6ECEF;--rail-muted:#8C99A4;--rail-hover:#1A242D;
+  --slack-side:#1C1726;color-scheme:dark;
+}
+html,body{height:100%}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 'Schibsted Grotesk',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+p{margin:0}
+.shell{display:grid;grid-template-columns:236px minmax(0,1fr);min-height:100%}
+.rail{background:var(--rail);color:var(--rail-ink);display:flex;flex-direction:column;gap:4px;padding:18px 12px;position:sticky;top:0;height:100vh;height:100dvh;overflow-y:auto}
+.brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:18px;padding:0 8px 18px}
+.rail h4{margin:4px 8px 6px;font-size:12px;font-weight:600;color:var(--rail-muted)}
+.seat{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;background:transparent;color:var(--rail-ink);padding:8px;border-radius:8px}
+.seat:hover{background:var(--rail-hover)}
+.seat[aria-pressed="true"]{background:var(--rail-hover);box-shadow:inset 3px 0 0 var(--brand)}
+.seat .av{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;flex:none}
+.seat .av svg{width:16px;height:16px}
+.seat .lbl{display:flex;flex-direction:column;line-height:1.2;flex:1;min-width:0}
+.seat .lbl b{font-size:14px;font-weight:600}
+.seat .lbl small{color:var(--rail-muted);font-size:12px}
+.badge{min-width:20px;height:20px;border-radius:10px;background:var(--bad);color:#fff;font-size:11.5px;font-weight:700;display:inline-grid;place-items:center;padding:0 6px;flex:none}
+.railfoot{margin-top:auto;border-top:1px solid var(--rail-hover);padding:14px 8px 0;display:flex;flex-direction:column;gap:8px}
+.railfoot .today{font-size:12px;color:var(--rail-muted)}
+.railfoot .today b{display:block;color:var(--rail-ink);font-size:15px}
+.rbtn{border:1px solid var(--rail-hover);background:transparent;color:var(--rail-ink);padding:7px 10px;border-radius:8px;text-align:left}
+.rbtn.go{background:var(--brand);border-color:var(--brand);color:var(--brand-ink);font-weight:600}
+.stage{min-width:0}
+.pnav{display:flex;align-items:center;gap:4px;border-bottom:1px solid var(--line);background:var(--surface);padding:0 24px;position:sticky;top:0;z-index:5;overflow-x:auto}
+.pnav .tab{padding:14px 12px}
+.pnav .spacer{flex:1}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:7px 12px;border-radius:8px;font-weight:500;line-height:1.2;white-space:nowrap}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.btn.danger{color:var(--bad)}
+.btn.link{border:0;background:transparent;padding:2px 0;color:var(--company);text-decoration:underline;text-underline-offset:2px;white-space:normal;text-align:left}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.sm{padding:4px 10px;font-size:13px}
+main{padding:24px 28px 48px;min-width:0}
+h1{font-size:26px;line-height:1.2;margin:0 0 4px;font-weight:700;letter-spacing:-.015em}
+h2{font-size:16px;margin:0}
+h3{font-size:14px;margin:0}
+.muted{color:var(--muted)}.small{font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:24px}
+.stat{padding:14px 16px;border:0;border-left:1px solid var(--line);background:transparent;color:var(--ink);text-align:left;position:relative;cursor:pointer;font:inherit}
+.stat:hover,.stat:focus-visible{background:var(--surface-2)}
+.stat .tip{display:none;position:absolute;left:12px;right:12px;top:calc(100% + 6px);z-index:10;background:var(--ink);color:var(--bg);font-size:13px;line-height:1.4;padding:8px 10px;border-radius:8px;pointer-events:none}
+.stat:hover .tip,.stat:focus-visible .tip{display:block}
+.stat .go{display:block;font-size:12px;color:var(--company);margin-top:2px}
+.stat:first-child{border-left:0;border-radius:10px 0 0 10px}
+.stat:last-child{border-radius:0 10px 10px 0}
+.stat b{display:block;font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.1}
+.stat span{color:var(--muted);font-size:13px}
+.cols{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:24px;align-items:start}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;margin-bottom:24px}
+.panel-h{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.item{padding:12px 16px;border-top:1px solid var(--line);display:flex;gap:12px;align-items:flex-start}
+.item:first-child{border-top:0}
+.item .body{flex:1;min-width:0}
+.acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.dot{width:8px;height:8px;border-radius:50%;flex:none;margin-top:8px}
+.empty{padding:20px 16px;color:var(--muted)}
+.rolecard{display:block;width:100%;text-align:left;background:transparent;border:0;border-top:1px solid var(--line);padding:14px 16px;color:var(--ink)}
+.rolecard:first-of-type{border-top:0}
+.rolecard .line1{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.bar{display:flex;height:6px;border-radius:3px;overflow:hidden;background:var(--surface-2);margin-top:8px}
+.bar i{display:block;height:100%}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);padding:10px 16px 14px;border-top:1px solid var(--line)}
+.legend i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:10px 12px;border-top:1px solid var(--line);vertical-align:top;font-size:14px}
+th{font-weight:600;color:var(--muted);font-size:13px;border-top:0;white-space:nowrap}
+.tag{display:inline-flex;align-items:center;font-size:12px;padding:1px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap;margin:2px 4px 2px 0}
+.tag.warn{color:var(--warn);border-color:var(--warn)}
+.tag.bad{color:var(--bad);border-color:var(--bad)}
+.tag.good{color:var(--good);border-color:var(--good)}
+.wait{font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;margin-top:6px}
+.wait i{width:7px;height:7px;border-radius:50%;display:inline-block;flex:none}
+.rolehead{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.facts{display:flex;gap:20px;flex-wrap:wrap;margin:8px 0 4px;font-size:14px}
+.facts span{color:var(--muted)}
+.board{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(200px,1fr);gap:10px;overflow-x:auto;padding-bottom:8px}
+.col{background:var(--surface-2);border-radius:10px;padding:10px;min-height:140px}
+.col h3{font-size:12.5px;margin:0 0 8px;display:flex;justify-content:space-between;color:var(--muted);font-weight:600}
+.card{display:block;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:8px;color:var(--ink)}
+.card b{display:block;font-size:14px}
+.card .small{display:block}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin:18px 0 16px;overflow-x:auto}
+.tab{border:0;background:transparent;padding:8px 12px;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap}
+.tab[aria-selected="true"],.tab[aria-current="page"]{color:var(--ink);border-bottom-color:var(--ink);font-weight:600}
+.scrim{position:fixed;inset:0;background:rgba(8,14,20,.38);z-index:40;border:0;padding:0}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(560px,100%);background:var(--surface);z-index:41;overflow-y:auto;border-left:1px solid var(--line);padding:calc(env(safe-area-inset-top,0px) + 18px) 22px calc(env(safe-area-inset-bottom,0px) + 28px)}
+.modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(680px,calc(100% - 24px));max-height:calc(100% - 40px);overflow-y:auto;background:var(--surface);z-index:41;border-radius:12px;border:1px solid var(--line);padding:22px}
+.xclose{float:right}
+.sec{margin-top:20px}
+.sec > h3{margin-bottom:8px}
+.tl{list-style:none;margin:0;padding:0}
+.tl li{display:grid;grid-template-columns:4px minmax(0,1fr);gap:10px;padding:6px 0}
+.tl li > i{border-radius:2px}
+.who{font-size:12px;font-weight:600}
+.fb{border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:8px}
+label{display:block;font-size:13px;font-weight:600;margin:12px 0 4px}
+input,select,textarea{font:inherit;width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+input[type=checkbox]{width:auto;margin:0 8px 0 0}
+textarea{min-height:70px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.hint{font-size:12.5px;color:var(--muted);margin-top:4px}
+.steps{display:flex;gap:6px;margin:6px 0 4px;flex-wrap:wrap}
+.steps span{font-size:12.5px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.steps span.on{border-color:var(--ink);color:var(--ink);font-weight:600}
+.stagerow{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,1.1fr) auto;gap:8px;align-items:center;margin-bottom:8px}
+.stagerow .ctl{display:flex;gap:4px}
+.lvl{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:8px;align-items:center;padding:6px 0;border-top:1px solid var(--line);font-size:14px}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;z-index:60;max-width:calc(100% - 32px);font-size:14px}
+/* candidate */
+.phonewrap{display:grid;grid-template-columns:220px minmax(0,580px);gap:28px;align-items:start;padding:24px 28px}
+.plist h3{font-size:12.5px;color:var(--muted);font-weight:600;margin:0 0 6px}
+.plist .convo{display:flex;justify-content:space-between;width:100%;text-align:left;padding:8px 10px;border:0;border-radius:6px;background:transparent;color:var(--ink);font-size:14px}
+.plist .convo[aria-current="true"]{background:var(--surface);font-weight:600}
+.phone{max-width:380px;border:9px solid var(--ink);border-radius:34px;height:min(740px,calc(100vh - 60px));min-height:540px;background:var(--surface);display:flex;flex-direction:column;overflow:hidden}
+.phtabs{display:flex;border-bottom:1px solid var(--line)}
+.phtabs button{flex:1;border:0;background:transparent;padding:10px 4px;color:var(--muted);border-bottom:2px solid transparent;font-size:13.5px}
+.phtabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--cand);font-weight:600}
+.ph-h{padding:10px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.ph-h .av{width:34px;height:34px;border-radius:50%;background:var(--brand);color:var(--brand-ink);display:grid;place-items:center;font-weight:700;font-size:13px;flex:none}
+.chat{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:8px;background:var(--surface-2)}
+.bub{max-width:84%;padding:8px 11px;border-radius:12px;font-size:14px;white-space:pre-line}
+.bub.in{background:var(--surface);align-self:flex-start;border:1px solid var(--line)}
+.bub.team{border-color:var(--team)}
+.bub.out{background:color-mix(in srgb,var(--cand) 20%,var(--surface));align-self:flex-end}
+.bub .meta{display:block;font-size:11px;color:var(--muted);margin-top:3px}
+.daysep{align-self:center;font-size:11.5px;color:var(--muted);padding:2px 8px}
+.quick{padding:10px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:6px;background:var(--surface)}
+.quick .note{font-size:13px;color:var(--muted);padding:4px}
+.chip{border:1px solid var(--cand);color:var(--cand);background:transparent;border-radius:999px;padding:6px 11px;font-size:13px;text-align:left}
+.chip.solid{background:var(--cand);color:#fff}
+.qform{width:100%}
+.qform label{margin-top:6px}
+.thread{display:block;width:100%;text-align:left;padding:12px 14px;border:0;border-bottom:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.apage{flex:1;overflow-y:auto;padding:16px 14px 20px;background:var(--surface)}
+.apage .co{font-size:12.5px;color:var(--muted)}
+.prog{list-style:none;padding:0;margin:14px 0 16px;display:flex;flex-direction:column;gap:0}
+.prog li{display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:center;font-size:14px;padding:4px 0;color:var(--muted)}
+.prog li .mk{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:11px;font-weight:700}
+.prog li.done{color:var(--ink)}
+.prog li.done .mk{background:var(--cand);border-color:var(--cand);color:#fff}
+.prog li.now{color:var(--ink);font-weight:600}
+.prog li.now .mk{border-color:var(--cand)}
+.next{border:1px solid var(--cand);border-radius:10px;padding:12px;margin-bottom:12px}
+.next h3{margin-bottom:4px}
+.next ul{margin:6px 0 0;padding-left:18px;font-size:14px}
+/* slack */
+.slack{display:grid;grid-template-columns:230px minmax(0,1fr);height:100vh;height:100dvh}
+.sside{background:var(--slack-side);color:var(--slack-ink);padding:16px 10px}
+.sside .ws{font-weight:700;font-size:16px;padding:0 8px 14px}
+.sside h4{font-size:12px;color:var(--slack-muted);margin:10px 8px 4px;font-weight:600}
+.sside .ch{display:flex;justify-content:space-between;align-items:center;width:100%;border:0;background:transparent;color:var(--slack-muted);padding:5px 8px;border-radius:6px;text-align:left}
+.sside .ch[aria-current="true"]{background:rgba(255,255,255,.12);color:var(--slack-ink);font-weight:600}
+.sside .me{margin-top:18px;padding:0 8px}
+.sside .me select{background:transparent;color:var(--slack-ink);border-color:rgba(255,255,255,.25)}
+.sside .me option{color:#16212B}
+.smain{display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--surface)}
+.shead{padding:12px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.sfeed{flex:1;overflow-y:auto;padding:12px 20px 40px}
+.smsg{display:grid;grid-template-columns:36px minmax(0,1fr);gap:10px;padding:12px 0;border-top:1px solid var(--line)}
+.smsg:first-child{border-top:0}
+.smsg .av{width:36px;height:36px;border-radius:8px;background:var(--brand);color:var(--brand-ink);display:grid;place-items:center;font-weight:700;font-size:13px}
+.smsg .nm{font-weight:700;font-size:14px}
+.smsg .app{font-size:10.5px;font-weight:700;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 4px;margin-left:4px}
+.smsg .tm{font-size:12px;color:var(--muted);margin-left:6px}
+.sblock{border-left:4px solid var(--line);padding:6px 0 6px 12px;margin-top:6px;max-width:640px}
+.sblock.ai{border-left-color:var(--agent)}
+.sblock .ailbl{font-size:12px;font-weight:700;color:var(--agent);margin-bottom:2px}
+.sblock ul{margin:4px 0 0;padding-left:18px;font-size:14px}
+.sbtns{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.sbtn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:6px;padding:5px 12px;font-weight:600;font-size:13.5px}
+.sbtn.go{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.sbtn.no{color:var(--bad)}
+.sbtn[aria-pressed="true"]{outline:2px solid var(--ink);outline-offset:1px}
+.sdone{font-size:13px;color:var(--muted);margin-top:8px}
+.srow{border-top:1px solid var(--line);padding:10px 0}
+.srow:first-of-type{border-top:0}
+.focus{background:color-mix(in srgb,var(--agent) 8%,transparent);border-radius:8px}
+/* team */
+.cockpit{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:24px;padding:24px 28px}
+.task{display:block;width:100%;text-align:left;border:0;border-top:1px solid var(--line);background:transparent;padding:12px 16px;color:var(--ink)}
+.task:first-child{border-top:0}
+.task[aria-current="true"]{background:var(--surface-2)}
+.check{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.check .ok{color:var(--good);font-weight:700}
+.check .no{color:var(--line);font-weight:700}
+ol.script{padding-left:20px;margin:6px 0 0}
+ol.script li{margin-bottom:6px;font-size:14px}
+ul.why{margin:6px 0 0;padding-left:18px}
+ul.why li{margin-bottom:2px}
+@media (max-width:980px){.phonewrap{grid-template-columns:1fr;padding:16px}.plist{display:flex;gap:4px;overflow-x:auto;align-items:center}.plist h3{display:none}.plist .convo{white-space:nowrap;width:auto}.cockpit{grid-template-columns:1fr;padding:16px}.slack{grid-template-columns:1fr;height:auto}.sside{display:flex;gap:8px;align-items:center;overflow-x:auto;padding:10px}.sside h4,.sside .ws{display:none}.sside .me{margin:0}.sside .ch{width:auto;white-space:nowrap}}
+@media (max-width:860px){
+  .shell{grid-template-columns:1fr}
+  .rail{position:sticky;top:0;z-index:30;height:auto;flex-direction:row;align-items:center;overflow-x:auto;padding:8px;gap:4px}
+  .brand{padding:0 8px 0 4px;font-size:16px}.rail h4{display:none}.seat{width:auto;white-space:nowrap;padding:6px}.seat .lbl small{display:none}
+  .railfoot{margin:0;border:0;padding:0 0 0 8px;flex-direction:row;align-items:center}.railfoot .today{white-space:nowrap}.rbtn{white-space:nowrap}
+  .pnav{position:static;padding:0 12px}
+  .cols{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat:nth-child(3){border-left:0}.stat:nth-child(n+3){border-top:1px solid var(--line)}
+  main{padding:16px 14px 40px}.row,.row3{grid-template-columns:1fr}.stagerow{grid-template-columns:1fr 1fr}.lvl{grid-template-columns:1fr}
+  .phone{height:640px}.sfeed{padding:10px 14px 30px}
+}
+@media (prefers-reduced-motion: no-preference){
+  .drawer{animation:slidein .18s ease-out}
+  @keyframes slidein{from{transform:translateX(24px);opacity:.5}to{transform:none;opacity:1}}
+}
+
+.phead{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.phead h1{margin:0}
+.phead p{color:var(--muted);margin-top:2px}
+.pill{display:inline-block;font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);margin-right:6px;vertical-align:2px}
+.pill.act{border-color:var(--agent);color:var(--agent);background:color-mix(in srgb,var(--agent) 10%,transparent)}
+.pill.done{border-color:var(--good);color:var(--good)}
+.owner{font-size:11.5px;font-weight:600;padding:1px 7px;border-radius:4px;background:var(--surface-2);color:var(--muted);margin-left:6px;white-space:nowrap}
+.aiweek{padding:14px 16px}
+.aiweek .nums{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0}
+.aiweek .nums div{border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.aiweek .nums b{display:block;font-size:20px;font-variant-numeric:tabular-nums}
+.aiweek .nums span{font-size:12.5px;color:var(--muted)}
+.saved{font-size:14px}
+.saved b{color:var(--good)}
+.upc{display:grid;grid-template-columns:76px minmax(0,1fr);gap:10px;padding:10px 16px;border-top:1px solid var(--line);font-size:14px}
+.upc:first-child{border-top:0}
+.upc .when{font-size:12.5px;color:var(--muted);font-weight:600}
+.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px}
+.filters label{margin:0 0 3px;font-size:12px;color:var(--muted)}
+.filters select,.filters input{width:auto;min-width:150px;padding:6px 8px;font-size:14px}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.tiles div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.tiles b{display:block;font-size:22px;font-variant-numeric:tabular-nums}
+.tiles span{font-size:12.5px;color:var(--muted)}
+.trow{display:grid;grid-template-columns:78px minmax(0,1fr) 62px 88px;gap:10px;align-items:center;width:100%;text-align:left;border:0;border-top:1px solid var(--line);background:transparent;padding:10px 14px;color:var(--ink);font-size:14px}
+.trow:first-child{border-top:0}
+.trow[aria-current="true"]{background:var(--surface-2)}
+.trow .sub{display:block;font-size:12.5px;color:var(--muted)}
+.prio{font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px}
+.prio i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.suggest{border:1px solid var(--agent);border-radius:8px;padding:10px 12px;margin:10px 0;font-size:14px}
+.suggest b{color:var(--agent);font-size:12.5px;display:block}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.fchip{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:4px 12px;font-size:13px}
+.fchip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.mailbox{border:1px solid var(--line);border-radius:12px;height:min(740px,calc(100vh - 60px));min-height:540px;background:var(--surface);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 1px 0 var(--line)}
+.mailtop{padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted);display:flex;justify-content:space-between}
+.mthread{flex:1;overflow-y:auto;padding:14px 16px;background:var(--surface-2);display:flex;flex-direction:column;gap:10px}
+.mail1{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:14px}
+.mail1 .mh{display:flex;justify-content:space-between;gap:12px;white-space:nowrap;overflow:hidden;font-size:12.5px;color:var(--muted);margin-bottom:4px}
+.mail1 .ms{font-weight:700;font-size:14px;margin-bottom:4px}
+.mail1 p{white-space:pre-line}
+.mail1.me{border-color:var(--cand);align-self:flex-end;max-width:85%}
+.mail1.team{border-color:var(--team)}
+.appl{display:block;width:100%;text-align:left;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:10px 12px;margin-bottom:8px;color:var(--ink)}
+.appl[aria-current="true"]{border-color:var(--cand);box-shadow:inset 3px 0 0 var(--cand)}
+.appl .st{font-size:12.5px;color:var(--muted)}
+.chan{font-size:11px;color:var(--muted);margin-left:6px}
+.pin{border:1px solid var(--agent);border-radius:8px;padding:10px 12px;margin:12px 0;background:color-mix(in srgb,var(--agent) 6%,var(--surface))}
+.pin .sbtns{margin-top:6px}
+@media (max-width:980px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.trow{grid-template-columns:80px minmax(0,1fr)}.trow .hide-sm{display:none}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ============ Basics ============ */
+const BASE = Date.UTC(2026, 9, 8);
+const fd = d => new Date(BASE + d * 864e5).toLocaleDateString('en-GB', {weekday:'short', day:'numeric', month:'short', timeZone:'UTC'});
+const fds = d => new Date(BASE + d * 864e5).toLocaleDateString('en-GB', {day:'numeric', month:'short', timeZone:'UTC'});
+const lpa = n => `₹${n} LPA`;
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clone = o => JSON.parse(JSON.stringify(o));
+let uid = 100;
+const nid = p => p + (uid++);
+let S, ui;
+
+const ACT = {
+  agent:{label:'HireLoop AI', c:'var(--agent)'},
+  team:{label:'HireLoop recruiter', c:'var(--team)'},
+  company:{label:'Acme', c:'var(--company)'},
+  hm:{label:'Hiring manager', c:'var(--hm)'},
+  cand:{label:'Candidate', c:'var(--cand)'}
+};
+const HPROD = 'Head of Product', HENG = 'Head of Engineering', HDES = 'Head of Design', HDATA = 'Head of Data', VPS = 'VP Sales', HFIN = 'Head of Finance';
+const HMS = {[HPROD]:'product', [HENG]:'engineering', [HDES]:'design', [HDATA]:'data', [VPS]:'sales', [HFIN]:'finance'};
+const ADMIN = 'Head of Talent';
+const BASE_RECS = {rec1:{name:'Recruiter 1', sub:'Product & design roles'}, rec2:{name:'Recruiter 2', sub:'Engineering roles'}};
+let RECS = {};
+const TEAM = ['Sneha','Arvind','Farah'];
+const TEMPLATES = {
+  pm:{label:'Product Manager', stages:[{name:'Hiring manager round',type:'interview',by:HPROD},{name:'Take-home assignment',type:'takehome',by:HPROD},{name:'Engineering round',type:'interview',by:HENG}]},
+  eng:{label:'Senior engineer', stages:[{name:'Technical screen',type:'interview',by:HENG},{name:'Hiring manager round',type:'interview',by:HENG},{name:'Final round',type:'interview',by:HENG}]},
+  junior:{label:'Junior engineer', stages:[{name:'DSA round 1',type:'interview',by:HENG},{name:'DSA round 2',type:'interview',by:HENG},{name:'DSA round 3',type:'interview',by:HENG},{name:'Take-home assignment',type:'takehome',by:HENG}]},
+  design:{label:'Designer', stages:[{name:'Portfolio review',type:'interview',by:HDES},{name:'Design exercise',type:'takehome',by:HDES},{name:'Team round',type:'interview',by:HPROD}]},
+  analyst:{label:'Analyst', stages:[{name:'Hiring manager round',type:'interview',by:HDATA},{name:'SQL take-home',type:'takehome',by:HDATA},{name:'Team round',type:'interview',by:HDATA}]},
+  sales:{label:'Sales', stages:[{name:'Hiring manager round',type:'interview',by:VPS},{name:'Mock pitch',type:'interview',by:VPS},{name:'Final round',type:'interview',by:HFIN}]},
+  custom:{label:'Start from scratch', stages:[{name:'Round 1',type:'interview',by:HPROD}]}
+};
+const KIND_LABEL = {outreach:'send first messages', booking:'book the next interview', takehome:'send the take-home'};
+const DEC = {strong_yes:'Strong yes', yes:'Yes', no:'No', strong_no:'Strong no'};
+const FLAG_REASONS = ['No-show without notice','Dishonest information (e.g. fake experience)','Unprofessional conduct','Plagiarised take-home','Accepted an offer, then ghosted'];
+const EDGES = [
+  [1,'Flagged candidate skipped in sourcing','Recruiter 1: create a Product Manager role, Find candidates. Karan is flagged.'],
+  [2,'Duplicate profiles merged','Same search: Divya is on Naukri and LinkedIn.'],
+  [3,'Already in another Acme role','Same search: Rohan is in the Product Analyst role.'],
+  [4,'Past feedback shown before approval','Same search: Nikhil got a "no" last year.'],
+  [5,'No reply: two follow-ups, then closed','Click Next day a few times. Neeraj has not replied.'],
+  [6,'Candidate says not interested or stop','As a candidate, tap Not interested or Stop messages.'],
+  [7,'Expected salary above budget','Screen Sana: she expects ₹48 LPA.'],
+  [8,'Notice period too long','Screen Meghna: 120 days.'],
+  [9,'Question the AI cannot answer','As a candidate, ask about relocation support.'],
+  [10,'Hiring manager late on a shortlist','Send a shortlist, then click Next day twice.'],
+  [11,'Candidate reschedules','Tap None of these work, twice.'],
+  [12,'Candidate does not show up','In a profile with a booked interview, tap Mark no-show.'],
+  [13,'Interview feedback overdue','Click Next day: Ankit\'s feedback is pending.'],
+  [14,'Strong no with do-not-shortlist flag','In Slack, pick Strong no and tick the flag.'],
+  [15,'Take-home late or more time asked','Next day past Ishita\'s deadline, or tap Need more time.'],
+  [16,'Offer above budget needs Head of Talent','Head of Talent: approve Kunal\'s offer.'],
+  [17,'Counter-offer','Reply I have another offer to an offer.'],
+  [18,'Offer declined','Decline an offer as the candidate.'],
+  [19,'Quiet or hesitant before joining','Next day (Rohit goes quiet), or reply rethinking.'],
+  [20,'Joining date change or no-show on day one','Recruiter 1: approve Nisha\'s new date, or mark Did not join.']
+];
+
+/* ============ People ============ */
+const PEOPLE = [
+  {id:'p_arjun',name:'Arjun Nair',headline:'Senior Product Manager, Paywise',years:6,loc:'Bengaluru',src:['Naukri'],match:92,channel:'whatsapp',hook:"I came across your work on Paywise's UPI checkout. ",why:['Led UPI checkout used by 4M people a month','Shipped an ML fraud score with data science','6 years in fintech product roles'],scr:{notice:60,exp:36,loc:'yes'},ext:[{company:'Northwind',role:'Senior Product Manager',status:'Second interview on 14 Oct'}]},
+  {id:'p_divya',name:'Divya Iyer',headline:'Product Manager, Finlo',years:5,loc:'Bengaluru',src:['Naukri','LinkedIn'],match:88,channel:'email',hook:"Your lending work at Finlo stood out. ",why:['Owns loan onboarding for 1.2M users','Ran pricing experiments with clear metrics','Works closely with risk and compliance'],scr:{notice:30,exp:34,loc:'yes'},ext:[{company:'Brightpath',role:'Lead Product Manager',status:'Profile shared, waiting'}]},
+  {id:'p_karan',name:'Karan Mehta',headline:'Product Manager, Cartly',years:5,loc:'Bengaluru',src:['Naukri'],match:83,channel:'whatsapp',hook:'',why:['Marketplace payments experience'],scr:{notice:60,exp:33,loc:'yes'}},
+  {id:'p_nikhil',name:'Nikhil Bose',headline:'Product Manager, Cartly',years:5,loc:'Bengaluru',src:['LinkedIn'],match:81,channel:'email',hook:"Your pay-later launch at Cartly caught our eye. ",why:['Shipped Cartly pay-later checkout','3 launches delivered on time','Has grown since applying to Acme last year'],scr:{notice:60,exp:35,loc:'yes'}},
+  {id:'p_sana',name:'Sana Qureshi',headline:'Senior Product Manager, Credora',years:7,loc:'Bengaluru',src:['LinkedIn'],match:86,channel:'email',hook:"Your rewards platform at Credora is impressive. ",why:['Built a credit-card rewards platform from zero','Leads a team of 3 PMs','Deep experience with bank partners'],scr:{notice:60,exp:48,loc:'yes'}},
+  {id:'p_meghna',name:'Meghna Pillai',headline:'Product Manager, Mintbridge',years:7,loc:'Bengaluru',src:['Naukri'],match:84,channel:'whatsapp',hook:"Your AI portfolio insights at Mintbridge stood out. ",why:['Wealth-tech product owner for 5 years','Launched AI portfolio insights','Strong user research habits'],scr:{notice:120,exp:38,loc:'yes'}},
+  {id:'p_rohan',name:'Rohan Das',headline:'Product Manager, Shopverse',years:5,loc:'Bengaluru',src:['Naukri'],match:79,channel:'email',hook:"Your checkout work at Shopverse is relevant here. ",why:['Checkout and payments PM','Comfortable with SQL and dashboards','Strong analytical background'],scr:{notice:30,exp:30,loc:'yes'}},
+  {id:'p_aisha',name:'Aisha Khan',headline:'Product Manager, Paywise',years:5,loc:'Bengaluru',src:['Referral from an Acme engineer'],match:85,channel:'whatsapp',hook:"An Acme engineer recommended you. ",why:['Referred by an Acme engineer','Merchant payments product owner','Known for crisp written specs'],scr:{notice:45,exp:34,loc:'yes'}},
+  {id:'p_tarun',name:'Tarun Joshi',headline:'Product Manager, Ledgerly',years:6,loc:'Pune',src:['Acme past applicant (2025)'],match:77,channel:'email',hook:"You applied to Acme last year, so we wanted to reach out again. ",why:['Applied to Acme in 2025, withdrew','B2B payments and invoicing','Open to moving to Bengaluru'],scr:{notice:60,exp:35,loc:'yes'}},
+  {id:'p_g1',name:'Harsh Vardhan',co:'Brightpath',years:6,loc:'Bengaluru',src:['Naukri'],match:84,channel:'whatsapp',hook:'',why:['6 years in a similar role','Fintech and payments exposure','Steady career'],scr:{notice:60,exp:0,loc:'yes'},generic:true},
+  {id:'p_g2',name:'Ananya Rao',co:'Stackpay',years:5,loc:'Bengaluru',src:['LinkedIn'],match:82,channel:'email',hook:'',why:['5 years in a similar role','Led two launches end to end','Strong references'],scr:{notice:30,exp:0,loc:'yes'},generic:true},
+  {id:'p_g3',name:'Siddharth Jain',co:'Ledgerly',years:7,loc:'Hyderabad',src:['Naukri','LinkedIn'],match:80,channel:'whatsapp',hook:'',why:['7 years, senior individual contributor','Open to Bengaluru','Payments domain'],scr:{notice:90,exp:0,loc:'yes'},generic:true},
+  {id:'p_g4',name:'Fatima Sheikh',co:'Credora',years:4,loc:'Bengaluru',src:['Referral from an Acme employee'],match:78,channel:'email',hook:'',why:['Referred by an Acme employee','4 years, fast learner','Strong communication'],scr:{notice:45,exp:0,loc:'yes'},generic:true},
+  {id:'p_farhan',name:'Farhan Ali',headline:'Backend Engineer, Stackpay',years:7,loc:'Bengaluru',src:['Naukri'],match:90,channel:'email',why:['Go on payments rails'],scr:{notice:60,exp:44,loc:'yes'}},
+  {id:'p_rohit',name:'Rohit Kulkarni',headline:'Senior Backend Engineer, Finlo',years:8,loc:'Bengaluru',src:['LinkedIn'],match:91,channel:'whatsapp',why:['Built the Finlo loan ledger in Go','Ran 20k requests a second in production','Mentors junior engineers'],scr:{notice:60,exp:46,loc:'yes'},ext:[{company:'Northwind',role:'Platform Engineer',status:'You withdrew after accepting Acme'}]},
+  {id:'p_pooja',name:'Pooja Shah',headline:'Backend Engineer, Credora',years:6,loc:'Bengaluru',src:['Naukri'],match:87,channel:'email',why:['Java services for card payments','Strong on testing and reliability','Owned on-call for 2 years'],scr:{notice:45,exp:44,loc:'yes'}},
+  {id:'p_ankit',name:'Ankit Verma',headline:'Senior Software Engineer, Paywise',years:7,loc:'Bengaluru',src:['LinkedIn'],match:86,channel:'email',why:['UPI switch integrations','Kafka and Postgres at scale','Calm under incidents'],scr:{notice:60,exp:45,loc:'yes'}},
+  {id:'p_lakshmi',name:'Lakshmi Raman',headline:'Backend Engineer, Ledgerly',years:6,loc:'Bengaluru',src:['Naukri'],match:84,channel:'whatsapp',why:['Invoicing engine in Go','Good API design sense','Open source contributor'],scr:{notice:30,exp:40,loc:'yes'}},
+  {id:'p_imran',name:'Imran Sheikh',headline:'Software Engineer II, Cartly',years:6,loc:'Bengaluru',src:['Referral from an Acme engineer'],match:83,channel:'email',why:['Checkout services in Java','Referred by an Acme engineer','Fast promotion track'],scr:{notice:30,exp:38,loc:'yes'}},
+  {id:'p_neeraj',name:'Neeraj Gupta',headline:'Backend Engineer, Shopverse',years:6,loc:'Bengaluru',src:['Naukri'],match:80,channel:'whatsapp',hook:"Your work on Shopverse's order service stood out. ",why:['Order management services','Go and gRPC','Steady 3-year tenure'],scr:{notice:60,exp:42,loc:'yes'}},
+  {id:'p_sonal',name:'Sonal Desai',headline:'Senior Engineer, Mintbridge',years:8,loc:'Bengaluru',src:['LinkedIn'],match:82,channel:'email',why:['Portfolio services in Java'],scr:{notice:60,exp:48,loc:'yes'}},
+  {id:'p_deepak',name:'Deepak Menon',headline:'Backend Engineer, Cartly',years:5,loc:'Bengaluru',src:['Naukri'],match:78,channel:'whatsapp',why:['Payments retries and idempotency'],scr:{notice:30,exp:39,loc:'yes'}},
+  {id:'p_kunal',name:'Kunal Bhat',headline:'Staff Engineer, Paywise',years:10,loc:'Bengaluru',src:['LinkedIn'],match:93,channel:'email',why:['Led the Paywise payments platform','Hired and grew a team of 6','Deep Go and distributed systems'],scr:{notice:90,exp:56,loc:'yes'}},
+  {id:'p_q1',name:'Megha Kulkarni',headline:'QA Engineer, Finlo',years:4,loc:'Bengaluru',src:['Naukri'],match:86,channel:'whatsapp',hook:"Your test automation work at Finlo stood out. ",why:['Built Finlo test automation','API and mobile testing','Strong on CI pipelines'],scr:{notice:30,exp:18,loc:'yes'}},
+  {id:'p_q2',name:'Sameer Khan',headline:'SDET, Shopverse',years:5,loc:'Bengaluru',src:['LinkedIn'],match:83,channel:'email',hook:'',why:['Selenium and Playwright suites','Performance testing','Payments flows'],scr:{notice:60,exp:20,loc:'yes'}},
+  {id:'p_q3',name:'Ritu Sharma',headline:'QA Engineer, Cartly',years:3,loc:'Bengaluru',src:['Referral from an Acme engineer'],match:80,channel:'whatsapp',hook:'',why:['Referred by an Acme engineer','Mobile app testing','Quick learner'],scr:{notice:30,exp:16,loc:'yes'}},
+  {id:'p_ishita',name:'Ishita Bansal',headline:'Product Designer, Finlo',years:5,loc:'Bengaluru',src:['LinkedIn'],match:88,channel:'email',why:['Designed the Finlo loan app end to end','Strong interaction design','Runs her own user tests'],scr:{notice:30,exp:28,loc:'yes'}},
+  {id:'p_kabir',name:'Kabir Malhotra',headline:'Senior Product Designer, Shopverse',years:7,loc:'Bengaluru',src:['Naukri'],match:85,channel:'whatsapp',why:['Checkout redesign that lifted conversion','Design system owner','Mobile-first'],scr:{notice:60,exp:31,loc:'yes'}},
+  {id:'p_tanvi',name:'Tanvi Shah',headline:'Product Designer, Mintbridge',years:6,loc:'Bengaluru',src:['LinkedIn'],match:90,channel:'email',why:['Redesigned Mintbridge onboarding','Strong visual and interaction design','Mentors junior designers'],scr:{notice:60,exp:30,loc:'yes'}},
+  {id:'p_varun',name:'Varun Iyer',headline:'Senior Analyst, Paywise',years:5,loc:'Bengaluru',src:['Naukri'],match:84,channel:'whatsapp',why:['Owns payments funnel dashboards','Ran 30+ A/B tests','Python and SQL'],scr:{notice:60,exp:28,loc:'yes'}},
+  {id:'p_nisha',name:'Nisha Rao',headline:'Product Analyst, Cartly',years:3,loc:'Bengaluru',src:['LinkedIn'],match:86,channel:'email',why:['Marketplace analytics','Clear storyteller with data','Strong SQL'],scr:{notice:30,exp:20,loc:'yes'}}
+];
+const POOL_PM = ['p_arjun','p_divya','p_karan','p_nikhil','p_sana','p_meghna','p_rohan','p_aisha','p_tarun'];
+const POOL_GEN = ['p_g1','p_g2','p_g3','p_g4'];
+
+/* ============ Lookups ============ */
+const P = id => S.people[id];
+const R = id => S.roles.find(r => r.id === id);
+const A = id => S.apps.find(a => a.id === id);
+const first = a => P(a.pid).name.split(' ')[0];
+const isActive = a => !['closed','joined'].includes(a.status);
+const stage = a => R(a.roleId).playbook[a.stageIdx];
+const stageHM = a => { const st = stage(a), r = R(a.roleId); return st && HMS[st.by] ? st.by : r.hm; };
+const activeFlag = p => p.flags.find(f => f.active);
+const chan = a => P(a.pid).channel === 'email' ? 'email' : 'WhatsApp';
+const RN = r => RECS[r.owner] ? RECS[r.owner].name : 'Recruiter';
+const teamFor = r => !r ? 'Farah' : (r.owner === 'rec1' ? 'Sneha' : (r.owner === 'rec2' ? 'Arvind' : 'Farah'));
+const kindOf = t => /Found|Searched/.test(t) ? 'sourcing' : (/slot|Booked|booked|took place/.test(t) ? 'scheduling' : (/Reminder|No reply from|nudge/.test(t) ? 'reminders' : (/Sent|Follow-up|check-in|Answered|Shared/.test(t) ? 'messages' : 'other')));
+
+/* ============ Events ============ */
+function ev(a, actor, text){ a.tl.push({d:S.day, actor, text}); S.log.unshift({d:S.day, roleId:a.roleId, actor, text:`${P(a.pid).name}: ${text}`, kind:kindOf(text)}); }
+function say(a, from, text, subj){ a.msgs.push({from, text, d:S.day, subj}); if (from === 'cand') a.lastReply = S.day; }
+function logRole(roleId, actor, text){ S.log.unshift({d:S.day, roleId, actor, text, kind:kindOf(text)}); }
+function edge(n){ if (!S.edges.includes(n)) S.edges.push(n); }
+function addTask(t){ const r = t.roleId ? R(t.roleId) : null; S.tasks.push({id:nid('t'), d:S.day, done:false, client:'Acme', assignee:teamFor(r), ...t}); }
+function slack(m){ S.inbox.push({id:nid('m'), d:S.day, done:false, ...m}); }
+function closeOpenWork(a){
+  S.tasks.forEach(t => { if (t.appId === a.id && !t.done) { t.done = true; t.doneD = S.day; t.outcome = 'Closed automatically'; } });
+  S.inbox.forEach(m => { if (!m.done && m.appId === a.id) { m.done = true; m.result = 'No longer needed'; } });
+}
+function toast(text){ ui.toast = text; clearTimeout(ui.toastT); ui.toastT = setTimeout(() => { ui.toast = null; render(); }, 3200); }
+
+function mkApp(pid, roleId, status, step, extra){
+  const a = {id:nid('a'), pid, roleId, status, step, stageIdx:0, tags:[], screen:null, followups:0, firstOut:null, lastOut:null, lastReply:null,
+    resched:0, noShows:0, slots:[], slot:null, offer:null, joinDate:null, newJoin:null, closed:null, msgs:[], tl:[], waitingSince:null, rem:0,
+    checkins:0, lastCheckin:null, acceptDay:null, paused:false, held:false, pending:null, consentAsk:false, declineAsk:false, suggestFlag:false,
+    reviewed:true, thDue:null, thRem:0, quietFlag:false, ...(extra || {})};
+  S.apps.push(a); return a;
+}
+function closeApp(a, reason, actor, o){
+  o = o || {};
+  const prev = a.status;
+  a.closed = {reason, d:S.day, by:actor, prev, prevStage: prev === 'interviewing' ? stage(a).name : null};
+  a.status = 'closed'; a.pending = null; a.paused = false;
+  ev(a, actor, `Closed: ${reason}`);
+  if (!o.silent && a.msgs.length) {
+    say(a, 'agent', o.msg || `Hi ${first(a)}, thank you for your time with Acme. The team has decided not to move forward for this role.\n\nCan we keep you in mind for future roles?`, 'Update on your application');
+    a.consentAsk = o.consent !== false;
+  }
+  closeOpenWork(a);
+}
+function gate(a, kind){
+  const r = R(a.roleId);
+  if (r.autonomy[kind] === 'approve') { a.pending = kind; ev(a, 'agent', `Ready to ${KIND_LABEL[kind]}. Waiting for ${RN(r)}'s approval.`); return false; }
+  return true;
+}
+
+/* ============ AI summaries ============ */
+function probeFor(a){
+  const r = R(a.roleId), st = stage(a);
+  if (/engineer/i.test(r.title)) return st && st.type === 'takehome' ? 'Code quality and tests' : 'How they debugged a production incident';
+  if (/design/i.test(r.title)) return 'A design decision they changed after user research';
+  if (/analyst/i.test(r.title)) return 'An experiment they ran and what it changed';
+  return 'A metric they moved, and the trade-offs they made';
+}
+function aiLines(a){
+  const p = P(a.pid), r = R(a.roleId);
+  const prior = p.feedback.filter(f => f.roleId === r.id);
+  return [
+    ['Who', `${p.headline}, ${p.years} years`],
+    ['Why shortlisted', p.why.slice(0, 2).join('; ')],
+    ['Earlier rounds', prior.length ? prior.map(f => `${f.stage}: ${DEC[f.decision].toLowerCase()}${f.notes ? ` ("${f.notes}")` : ''}`).join('; ') : 'None, this is their first round'],
+    ['Ask about', probeFor(a)]
+  ];
+}
+
+/* ============ Agent work ============ */
+function doOutreach(a){
+  const r = R(a.roleId), p = P(a.pid);
+  a.status = 'contacted'; a.step = 'awaiting'; a.firstOut = S.day; a.lastOut = S.day;
+  say(a, 'agent', `Hi ${first(a)}, I'm the HireLoop assistant, writing for Acme.\n\n${p.hook || ''}Acme is hiring a ${r.title} in ${r.location} (${r.mode}). Open to a quick chat?\n\nReply any time, or ask for a person.`, `${r.title} role at Acme`);
+  ev(a, 'agent', `Sent first message by ${chan(a)}`);
+}
+function sendSlots(a, again){
+  const st = stage(a), times = ['11:00','15:30','17:00'];
+  a.slots = [S.day + 2, S.day + 3, S.day + 4].map((d, i) => ({d, time:times[i]}));
+  a.step = 'scheduling';
+  say(a, 'agent', again ? 'No problem. Here are other times:' : `Good news, ${first(a)}! Acme's ${st.by} would like to meet you for the ${st.name.toLowerCase()}.\n\nPick a time:`, `Pick a time: ${st.name}`);
+  ev(a, 'agent', `Offered 3 slots for ${st.name}`);
+}
+function bookSlot(a, s){
+  const st = stage(a), who = HMS[st.by] ? st.by : R(a.roleId).hm;
+  a.slot = s; a.step = 'scheduled';
+  slack({hm:who, type:'brief', appId:a.id, roleId:a.roleId, stage:st.name, slot:s, done:true, result:'Info'});
+}
+function sendTakehome(a){
+  const st = stage(a);
+  a.step = 'takehome'; a.thDue = S.day + 4; a.thRem = 0;
+  say(a, 'agent', `Great news, ${first(a)}: you cleared the last round. Next is the ${st.name.toLowerCase()}.\n\nBrief: propose a feature that cuts failed payments by 20%. One page, with the metrics you'd track.\n\nDue ${fd(a.thDue)}. Need more time? Just reply.`, `Your ${st.name.toLowerCase()}`);
+  ev(a, 'agent', `Sent the ${st.name.toLowerCase()} (automatic step)`);
+  addTask({type:'receipt', appId:a.id, roleId:a.roleId, title:`Call ${P(a.pid).name}: confirm the take-home arrived`, why:'Playbook step: a person confirms receipt and answers doubts.'});
+}
+function startStage(a){
+  const st = stage(a);
+  a.waitingSince = null; a.rem = 0; a.slot = null;
+  if (st.type === 'interview') { a.step = 'scheduling'; a.slots = []; if (gate(a, 'booking')) sendSlots(a); }
+  else { a.step = 'takehome'; if (gate(a, 'takehome')) sendTakehome(a); }
+}
+function interviewHappened(a){
+  const st = stage(a), who = stageHM(a);
+  a.step = 'feedback'; a.waitingSince = S.day; a.rem = 0;
+  ev(a, 'agent', `${st.name} took place. Feedback request sent to the ${who} on Slack.`);
+  say(a, 'agent', `Thanks for your time today, ${first(a)}. You'll hear from me within 2 working days.`, `Thank you: ${st.name}`);
+  slack({hm:who, type:'scorecard', appId:a.id, roleId:a.roleId, stage:st.name, kind:'interview', when:a.slot});
+}
+function sendOffer(a){
+  const r = R(a.roleId);
+  a.step = 'sent';
+  say(a, 'agent', `${first(a)}, Acme is delighted to offer you the ${r.title} role.\n\nCTC: ${lpa(a.offer.ctc)}\nJoining: ${fd(a.offer.join)}\nLocation: ${r.location}, ${r.mode}\n\nThe letter is attached.`, 'Your offer from Acme');
+  ev(a, 'agent', 'Sent the offer');
+}
+function checkinText(a){
+  const r = R(a.roleId), n = a.checkins % 3;
+  if (n === 1) return `Hi ${first(a)}, a note from Acme's ${r.hm}: "Really looking forward to having you on the team."`;
+  if (n === 2) return `Here's a short video from your future team about what they're building. How is your notice period going?`;
+  return `Would you like a coffee call with someone from your future team before you join?`;
+}
+function hmOverdue(a){
+  const who = a.status === 'interviewing' && a.step === 'feedback' ? stageHM(a) : R(a.roleId).hm;
+  const since = S.day - (a.waitingSince ?? S.day);
+  const n = a.status === 'interviewing' ? 13 : 10;
+  if (since >= 1 && a.rem === 0) {
+    a.rem = 1; edge(n);
+    slack({hm:who, type:'reminder', appId:a.id, roleId:a.roleId, about:a.status === 'shortlist_hm' ? 'decision' : (a.status === 'offer' ? 'offer approval' : 'feedback')});
+    ev(a, 'agent', `Reminder sent to the ${who} on Slack`);
+  } else if (since >= 2 && a.rem === 1) {
+    a.rem = 2; edge(n);
+    ev(a, 'agent', `No reply from the ${who} in 2 days. Flagged to ${RN(R(a.roleId))}.`);
+  }
+}
+
+/* ============ Seed ============ */
+function seed(){
+  uid = 100;
+  RECS = clone(BASE_RECS);
+  S = {day:0, roles:[], people:{}, apps:[], tasks:[], inbox:[], log:[], edges:[], hidden:[]};
+  PEOPLE.forEach(p => { S.people[p.id] = Object.assign({flags:[], feedback:[], consent:null, ext:[]}, clone(p)); });
+  S.people.p_karan.flags.push({reason:'No-show without notice', note:'Missed two interviews for Associate Product Manager.', by:HPROD, d:-170, review:195, active:true});
+  S.people.p_nikhil.feedback.push({roleTitle:'Associate Product Manager', stage:'Hiring manager round', decision:'no', notes:'Strong on execution; weak on metrics.', by:HPROD, d:-210});
+  const mkRole = o => { const r = Object.assign({status:'Open', filled:0, runs:1, skipped:[], intake:'', autonomy:{outreach:'auto', booking:'auto', takehome:'auto'}, created:-30, company:'Acme'}, o); S.roles.push(r); return r; };
+  mkRole({id:'r_be', owner:'rec2', title:'Senior Backend Engineer', seats:6, filled:1, min:35, max:50, maxNotice:90, location:'Bengaluru', mode:'hybrid, 3 days in office', target:120, hm:HENG, playbook:clone(TEMPLATES.eng.stages), intake:'Go or Java on payments systems. Must have run high-traffic systems in production. Debugging under pressure matters most.', req:'6+ years backend, Go or Java, payments or high-scale systems', created:-40});
+  mkRole({id:'r_qa', owner:'rec2', title:'QA Engineer', seats:2, min:14, max:22, maxNotice:60, location:'Bengaluru', mode:'hybrid, 3 days in office', target:80, hm:HENG, playbook:[{name:'Technical screen',type:'interview',by:HENG},{name:'Test-writing exercise',type:'takehome',by:HENG}], autonomy:{outreach:'approve', booking:'auto', takehome:'auto'}, intake:'Automation-first QA. Payments flows a plus.', req:'3+ years QA automation', created:-5});
+  mkRole({id:'r_pd', owner:'rec1', title:'Product Designer', seats:2, min:22, max:32, maxNotice:60, location:'Bengaluru', mode:'hybrid, 3 days in office', target:50, hm:HDES, playbook:clone(TEMPLATES.design.stages), intake:'Mobile-first fintech design. Strong interaction design.', req:'4+ years product design, mobile apps', created:-25});
+  mkRole({id:'r_pa', owner:'rec1', title:'Product Analyst', seats:3, min:15, max:24, maxNotice:60, location:'Bengaluru', mode:'hybrid, 3 days in office', target:90, hm:HDATA, playbook:clone(TEMPLATES.analyst.stages), intake:'SQL fluency, product sense, experiments.', req:'2+ years analytics, SQL', created:-20});
+  mkRole({id:'r_da', owner:'rec1', title:'Data Analyst', seats:2, min:12, max:18, maxNotice:60, location:'Bengaluru', mode:'hybrid', target:100, hm:HDATA, playbook:[{name:'Hiring manager round',type:'interview',by:HDATA},{name:'SQL take-home',type:'takehome',by:HDATA}], status:'On hold', intake:'Paused until next quarter.', req:'1+ years analytics, SQL', runs:0, created:-15});
+
+  const T = (a, d, actor, text) => a.tl.push({d, actor, text});
+  const M = (a, d, from, text, subj) => a.msgs.push({from, text, d, subj});
+
+  // Recruiter 2: engineering
+  let a = mkApp('p_farhan','r_be','joined','joined',{stageIdx:2, joinDate:-10, offer:{ctc:44, join:-10}, screen:{notice:60, exp:44, loc:'yes'}});
+  T(a,-60,'agent','Found on Naukri'); T(a,-40,'cand','Accepted the offer'); T(a,-10,'company','Joined Acme');
+
+  a = mkApp('p_rohit','r_be','notice','ok',{stageIdx:2, offer:{ctc:46, join:3}, joinDate:3, acceptDay:-20, lastCheckin:-5, checkins:2, lastReply:-6, screen:{notice:60, exp:46, loc:'yes'}});
+  T(a,-50,'agent','Found on LinkedIn'); T(a,-20,'cand','Accepted the offer'); T(a,-5,'agent','Notice-period check-in sent');
+  M(a,-20,'agent','Wonderful news, Rohit! Welcome to Acme. You join on ' + fd(3) + '.'); M(a,-6,'cand','Thanks! Serving notice, all good.'); M(a,-5,'agent','Here\'s a short video from your future team about what they\'re building. How is your notice period going?');
+
+  a = mkApp('p_pooja','r_be','offer','hm',{stageIdx:2, offer:{ctc:44, join:45}, waitingSince:-1, screen:{notice:45, exp:44, loc:'yes'}});
+  T(a,-35,'agent','Found on Naukri'); T(a,-2,'hm','Head of Engineering: Final round, strong yes'); T(a,-1,'company','Recruiter 2 drafted the offer: ₹44 LPA');
+  M(a,-2,'agent','Great news, Pooja: you cleared all rounds! The team is preparing your offer.', 'Great news from Acme');
+  S.people.p_pooja.feedback.push({roleId:'r_be', roleTitle:'Senior Backend Engineer', stage:'Final round', decision:'strong_yes', notes:'Excellent on reliability.', by:HENG, d:-2});
+  slack({hm:HENG, type:'offer', appId:a.id, roleId:'r_be'}); S.inbox.at(-1).d = -1;
+
+  a = mkApp('p_kunal','r_be','offer','admin',{stageIdx:2, offer:{ctc:54, join:60, note:'Staff-level candidate; strongest we have seen.'}, screen:{notice:90, exp:56, loc:'yes'}});
+  T(a,-30,'agent','Found on LinkedIn'); T(a,-3,'hm','Head of Engineering: Final round, strong yes'); T(a,0,'company','Recruiter 2 drafted ₹54 LPA, above the ₹50 LPA budget. Sent to the Head of Talent.');
+  M(a,-3,'agent','Great news, Kunal: you cleared all rounds! The team is preparing your offer.', 'Great news from Acme');
+  S.people.p_kunal.feedback.push({roleId:'r_be', roleTitle:'Senior Backend Engineer', stage:'Final round', decision:'strong_yes', notes:'Best systems design round this year.', by:HENG, d:-3});
+
+  a = mkApp('p_ankit','r_be','interviewing','feedback',{stageIdx:1, waitingSince:0, slot:{d:0, time:'11:00'}, screen:{notice:60, exp:45, loc:'yes'}});
+  T(a,-20,'agent','Found on LinkedIn'); T(a,-6,'hm','Head of Engineering: Technical screen, yes'); T(a,0,'agent','Hiring manager round took place. Feedback request sent on Slack.');
+  M(a,0,'agent','Thanks for your time today, Ankit. You\'ll hear from me within 2 working days.', 'Thank you: Hiring manager round');
+  S.people.p_ankit.feedback.push({roleId:'r_be', roleTitle:'Senior Backend Engineer', stage:'Technical screen', decision:'yes', notes:'Solid systems thinking.', by:HENG, d:-6});
+  slack({hm:HENG, type:'brief', appId:a.id, roleId:'r_be', stage:'Hiring manager round', slot:{d:0, time:'11:00'}, done:true, result:'Info'}); S.inbox.at(-1).d = -1;
+  slack({hm:HENG, type:'scorecard', appId:a.id, roleId:'r_be', stage:'Hiring manager round', kind:'interview', when:{d:0, time:'11:00'}});
+
+  a = mkApp('p_lakshmi','r_be','interviewing','scheduled',{stageIdx:0, slot:{d:1, time:'11:00'}, screen:{notice:30, exp:40, loc:'yes'}});
+  T(a,-10,'agent','Found on Naukri'); T(a,-2,'cand','Picked ' + fd(1) + ', 11:00');
+  M(a,-2,'agent','Booked: technical screen with Acme\'s Head of Engineering on ' + fd(1) + ', 11:00.', 'Confirmed: Technical screen');
+  slack({hm:HENG, type:'brief', appId:a.id, roleId:'r_be', stage:'Technical screen', slot:{d:1, time:'11:00'}, done:true, result:'Info'});
+
+  a = mkApp('p_imran','r_be','ready','ready',{screen:{notice:30, exp:38, loc:'yes'}});
+  T(a,-3,'agent','Found via referral'); T(a,-1,'agent','Screening done: ready for shortlist');
+  M(a,-1,'agent','Thanks, Imran. I\'m sharing your profile with the hiring team. You\'ll hear from me within 2 working days.', 'Thanks for your answers');
+
+  a = mkApp('p_neeraj','r_be','contacted','awaiting',{firstOut:-1, lastOut:-1});
+  T(a,-1,'agent','Sent first message by WhatsApp');
+  M(a,-1,'agent','Hi Neeraj, I\'m the HireLoop assistant, writing for Acme.\n\nYour work on Shopverse\'s order service stood out. Acme is hiring a Senior Backend Engineer in Bengaluru. Open to a quick chat?');
+
+  a = mkApp('p_deepak','r_be','closed','closed',{suggestFlag:true, noShows:2, closed:{reason:'No-show twice', d:-1, by:'agent', prev:'interviewing', prevStage:'Technical screen'}});
+  T(a,-12,'agent','Found on Naukri'); T(a,-4,'agent','Missed the technical screen'); T(a,-1,'agent','Closed: No-show twice');
+  M(a,-4,'agent','Hi Deepak, we missed you today. Everything okay? If you\'d still like to go ahead, here are new times.'); M(a,-1,'agent','Hi Deepak, we missed you again today, so Acme has closed this application. All the best.');
+
+  a = mkApp('p_sonal','r_be','closed','closed',{closed:{reason:'Hiring manager said no at shortlist', d:-12, by:'hm', prev:'shortlist_hm'}});
+  T(a,-12,'hm','Closed: Hiring manager said no at shortlist');
+  S.people.p_sonal.feedback.push({roleId:'r_be', roleTitle:'Senior Backend Engineer', stage:'Shortlist', decision:'no', notes:'Wanted deeper payments experience.', by:HENG, d:-12});
+
+  ['p_q1','p_q2','p_q3'].forEach(pid => { const x = mkApp(pid,'r_qa','sourced','review',{pending:'outreach'}); T(x,-1,'agent',`Found on ${P(pid).src[0]}`); T(x,0,'team','Approved in quality check'); T(x,0,'agent','Ready to send first messages. Waiting for Recruiter 2\'s approval.'); });
+
+  // Recruiter 1: product, design, data
+  a = mkApp('p_ishita','r_pd','interviewing','takehome',{stageIdx:1, thDue:2, screen:{notice:30, exp:28, loc:'yes'}});
+  T(a,-9,'agent','Found on LinkedIn'); T(a,-2,'hm','Head of Design: Portfolio review, strong yes'); T(a,-2,'agent','Sent the design exercise (automatic step)');
+  M(a,-2,'agent','Great news, Ishita: you cleared the last round. Next is the design exercise.\n\nDue ' + fd(2) + '. Need more time? Just reply.', 'Your design exercise');
+  S.people.p_ishita.feedback.push({roleId:'r_pd', roleTitle:'Product Designer', stage:'Portfolio review', decision:'strong_yes', notes:'Excellent craft.', by:HDES, d:-2});
+  addTask({type:'receipt', appId:a.id, roleId:'r_pd', title:'Call Ishita Bansal: confirm the take-home arrived', why:'Playbook step: a person confirms receipt and answers doubts.'}); S.tasks.at(-1).d = -1;
+
+  a = mkApp('p_kabir','r_pd','shortlist_hm','shortlist',{waitingSince:0, screen:{notice:60, exp:31, loc:'yes'}});
+  T(a,-4,'agent','Found on Naukri'); T(a,0,'company','Recruiter 1 sent the shortlist');
+  M(a,-1,'agent','Thanks, Kabir. I\'m sharing your profile with the hiring team.'); M(a,0,'cand','Thanks! Is the design team remote-friendly?'); M(a,0,'agent',"Good question. I'm checking with Acme. You'll hear back today.");
+  slack({hm:HDES, type:'shortlist', roleId:'r_pd', appIds:[a.id], decided:{}});
+  addTask({type:'question', appId:a.id, roleId:'r_pd', q:'Is the design team remote-friendly?', title:"Answer Kabir Malhotra's question", why:'"Is the design team remote-friendly?" The AI didn\'t know.'});
+
+  a = mkApp('p_tanvi','r_pd','offer','draft',{stageIdx:2, screen:{notice:60, exp:30, loc:'yes'}});
+  T(a,-18,'agent','Found on LinkedIn'); T(a,-1,'hm','Head of Product: Team round, yes'); T(a,-1,'agent','All rounds cleared. Ready for an offer.');
+  M(a,-1,'agent','Great news, Tanvi: you cleared all rounds! The team is preparing your offer.', 'Great news from Acme');
+  [['Portfolio review','strong_yes','Thoughtful process.',HDES,-10],['Design exercise','yes','Clean, well-reasoned flows.',HDES,-5],['Team round','yes','Great collaborator.',HPROD,-1]].forEach(([st,dec,n,by,d]) => S.people.p_tanvi.feedback.push({roleId:'r_pd', roleTitle:'Product Designer', stage:st, decision:dec, notes:n, by, d}));
+
+  a = mkApp('p_varun','r_pa','screening','decide',{firstOut:-3, lastReply:-1, tags:['Over budget'], screen:{notice:60, exp:28, loc:'yes', why:'Bigger scope'}});
+  T(a,-3,'agent','Sent first message by WhatsApp'); T(a,-1,'agent','Screening done. Needs Recruiter 1\'s call: over budget');
+  M(a,-3,'agent','Hi Varun, I\'m the HireLoop assistant, writing for Acme. Acme is hiring a Product Analyst in Bengaluru. Open to a quick chat?'); M(a,-1,'cand','Notice: 60 days\nExpected: ₹28 LPA'); M(a,-1,'agent','Thanks, Varun. I\'m checking a couple of details with the team.');
+
+  a = mkApp('p_nisha','r_pa','notice','datechange',{stageIdx:2, offer:{ctc:20, join:20}, joinDate:20, newJoin:34, acceptDay:-8, lastCheckin:-1, checkins:1, lastReply:0, screen:{notice:30, exp:20, loc:'yes'}});
+  T(a,-8,'cand','Accepted the offer'); T(a,0,'cand','Asked to join on ' + fd(34) + ' instead');
+  M(a,-8,'agent','Wonderful news, Nisha! Welcome to Acme. You join on ' + fd(20) + '.', 'Welcome to Acme'); M(a,0,'cand','Can I move my joining date by 2 weeks? My manager asked me to finish a project.'); M(a,0,'agent','Let me check with Acme.');
+
+  a = mkApp('p_rohan','r_pa','interviewing','scheduled',{stageIdx:0, slot:{d:2, time:'15:30'}, screen:{notice:30, exp:22, loc:'yes'}});
+  T(a,-6,'agent','Found on Naukri'); T(a,-1,'cand','Picked ' + fd(2) + ', 15:30');
+  M(a,-1,'agent','Booked: hiring manager round with Acme\'s Head of Data on ' + fd(2) + ', 15:30.', 'Confirmed: Hiring manager round');
+  slack({hm:HDATA, type:'brief', appId:a.id, roleId:'r_pa', stage:'Hiring manager round', slot:{d:2, time:'15:30'}, done:true, result:'Info'});
+
+  // Other HireLoop clients (only visible to HireLoop recruiters)
+  S.tasks.push({id:nid('t'), d:0, done:false, client:'Northwind', roleTitle:'Senior Product Manager', cand:'Arjun Nair', type:'call', assignee:'Farah', title:'Call Arjun Nair: confirm second interview', why:'Asked to talk to a person about the interview format.', ext:true});
+  S.tasks.push({id:nid('t'), d:-1, done:false, client:'Northwind', roleTitle:'Sales Lead', cand:'Vivek Shah', type:'question', assignee:'Farah', q:'Is there a joining bonus?', title:"Answer Vivek Shah's question", why:'"Is there a joining bonus?" The AI didn\'t know.', ext:true});
+  S.tasks.push({id:nid('t'), d:0, done:false, client:'Brightpath', roleTitle:'Data Engineer', cand:'Leena Das', type:'negotiation', assignee:'Arvind', title:'Leena Das has another offer', why:'Our offer: ₹32 LPA. AI paused. Call within 1 hour.', ext:true});
+
+  // AI work log over the past week
+  const ai = (roleId, d, text) => S.log.push({d, roleId, actor:'agent', text, kind:kindOf(text)});
+  [-6,-5,-5,-4,-3,-2,-2,-1].forEach((d, i) => ai('r_be', d, ['Sent first message by WhatsApp','Follow-up 1 sent','Offered 3 slots for Technical screen','Booked: Technical screen','Reminder sent to the Head of Engineering on Slack','Notice-period check-in sent','Searched Naukri and LinkedIn: 5 added','Sent first message by email'][i]));
+  [-6,-4,-3,-1].forEach((d, i) => ai('r_qa', d, ['Searched Naukri and LinkedIn: 3 added','Sent first message by email','Follow-up 1 sent','Offered 3 slots for Technical screen'][i]));
+  [-6,-5,-4,-3,-2,-1].forEach((d, i) => ai('r_pd', d, ['Searched Naukri and LinkedIn: 4 added','Sent first message by email','Offered 3 slots for Portfolio review','Booked: Portfolio review','Sent the design exercise (automatic step)','Reminder sent to the Head of Design on Slack'][i]));
+  [-5,-3,-2,-1].forEach((d, i) => ai('r_pa', d, ['Sent first message by WhatsApp','Follow-up 1 sent','Booked: Hiring manager round','Notice-period check-in sent'][i]));
+  S.log.sort((x, y) => y.d - x.d);
+}
+
+function resetUI(){
+  ui = {persona:'rec1', view:'home', roleId:null, roleTab:'pipeline', drawer:null, pdrawer:null, modal:null, guide:false, toast:null,
+    hm:HENG, cand:'p_arjun', thread:null, ctab:'msg', papp:null, ask:null, task:null, wiz:null, dec:{}, chg:{}, focus:null,
+    tf:{who:'All', client:'All', type:'All', sort:'urgency'}, q:'', cf:'all', cmine:false};
+}
+
+/* ============ Scope ============ */
+const portal = () => ui.persona === 'admin' || !!RECS[ui.persona];
+const isAdmin = () => ui.persona === 'admin';
+const myRoles = () => isAdmin() ? S.roles : S.roles.filter(r => r.owner === ui.persona);
+const myApps = () => { const ids = new Set(myRoles().map(r => r.id)); return S.apps.filter(a => ids.has(a.roleId)); };
+const meName = () => isAdmin() ? ADMIN : (RECS[ui.persona] ? RECS[ui.persona].name : 'Recruiter');
+
+/* ============ Actions ============ */
+const X = {};
+const two = v => String(v).split('|');
+
+X.persona = v => { ui.cmine = false; ui.persona = v; ui.drawer = null; ui.pdrawer = null; ui.modal = null; if (portal()) { if (ui.view === 'role' && !myRoles().some(r => r.id === ui.roleId) && !isAdmin()) ui.view = 'roles'; } };
+X.nav = v => { ui.view = v; ui.drawer = null; ui.pdrawer = null; };
+X.openRole = v => { ui.view = 'role'; ui.roleId = v; ui.roleTab = 'pipeline'; ui.drawer = null; ui.pdrawer = null; if (!portal()) ui.persona = R(v).owner; };
+X.roleTab = v => { ui.roleTab = v; };
+X.openApp = v => { ui.drawer = v; ui.pdrawer = null; if (!portal()) ui.persona = R(A(v).roleId).owner; };
+X.openPerson = v => { ui.pdrawer = v; ui.drawer = null; };
+X.closeDrawer = () => { ui.drawer = null; ui.pdrawer = null; };
+X.closeModal = () => { ui.modal = null; ui.wiz = null; };
+X.guide = () => { ui.guide = !ui.guide; };
+X.reset = () => { seed(); resetUI(); toast('Demo reset to the start'); };
+X.dismiss = v => { S.hidden.push(v); };
+X.asPersona = v => { X.persona(v); ui.view = 'home'; };
+X.goPhone = v => { const a = A(v); ui.persona = 'cand'; ui.cand = a.pid; ui.thread = a.id; ui.ctab = 'msg'; ui.drawer = null; };
+X.goSlack = v => { const a = A(v); ui.persona = 'hm'; ui.hm = (a.status === 'interviewing' && a.step === 'feedback') ? stageHM(a) : R(a.roleId).hm; const m = S.inbox.find(x => !x.done && x.hm === ui.hm && (x.appId === a.id || (x.appIds || []).includes(a.id)) && x.type !== 'reminder'); ui.focus = m ? m.id : null; ui.drawer = null; };
+X.cf = v => { ui.cf = v; };
+X.cmine = () => { ui.cmine = !ui.cmine; };
+X.stat = v => {
+  ui.drawer = null; ui.pdrawer = null;
+  if (v === 'roles' || v === 'seats') { ui.view = 'roles'; return; }
+  ui.view = 'candidates'; ui.q = ''; ui.cf = v === 'offers' ? 'offer' : 'active'; ui.cmine = !isAdmin();
+};
+X.addRecModal = () => { ui.modal = {type:'addrec'}; };
+X.addRec = () => {
+  const n = Object.keys(RECS).length + 1, key = 'rec' + n;
+  const name = (document.getElementById('nr-name').value || '').trim() || `Recruiter ${n}`;
+  const sub = (document.getElementById('nr-sub').value || '').trim() || 'New roles';
+  RECS[key] = {name, sub}; ui.modal = null;
+  toast(`${name} added. Give them a role from the role page or New role.`);
+};
+X.roleOwner = (v, el) => { const r = R(el.dataset.k); r.owner = v; logRole(r.id, 'company', `Head of Talent moved this role to ${RECS[v].name}`); toast(`${r.title} now belongs to ${RECS[v].name}.`); };
+
+X.advance = () => {
+  S.day++;
+  const d = S.day;
+  for (const a of S.apps) {
+    if (a.held) continue;
+    if (a.status === 'contacted' && a.firstOut != null) {
+      const replied = a.lastReply != null && a.lastReply >= a.firstOut;
+      const since = d - a.firstOut;
+      if (!replied) {
+        if (since >= 2 && a.followups === 0) { a.followups = 1; edge(5); say(a, 'agent', `Hi ${first(a)}, just bumping this in case it got buried.`); ev(a, 'agent', 'Follow-up 1 sent (no reply in 2 days)'); }
+        else if (since >= 5 && a.followups === 1) { a.followups = 2; edge(5); say(a, 'agent', `Last note from me, ${first(a)}. If now isn't the right time, no problem.`); ev(a, 'agent', 'Follow-up 2 sent (no reply in 5 days)'); }
+        else if (since >= 7 && a.followups === 2) { edge(5); closeApp(a, 'No reply after 2 follow-ups', 'agent', {silent:true}); }
+      }
+    }
+    if (a.status === 'interviewing' && !a.paused) {
+      if (a.step === 'scheduled' && a.slot && d >= a.slot.d) interviewHappened(a);
+      else if (a.step === 'feedback' || a.step === 'th_review') hmOverdue(a);
+      else if (a.step === 'takehome' && a.thDue != null && d > a.thDue) {
+        if (a.thRem === 0) { a.thRem = 1; edge(15); say(a, 'agent', `Hi ${first(a)}, gentle reminder: the take-home was due ${fd(a.thDue)}. Need more time? Just reply.`, 'Reminder: your take-home'); ev(a, 'agent', 'Take-home late: reminder sent'); }
+        else if (a.thRem === 1 && d > a.thDue + 2) { a.thRem = 2; edge(15); addTask({type:'th_missing', appId:a.id, roleId:a.roleId, title:`${P(a.pid).name} hasn't sent the take-home`, why:`Was due ${fd(a.thDue)}. One reminder sent.`}); ev(a, 'agent', 'Take-home still missing: passed to a HireLoop recruiter'); }
+      }
+    }
+    if (a.status === 'shortlist_hm') hmOverdue(a);
+    if (a.status === 'offer' && a.step === 'hm') hmOverdue(a);
+    if (a.status === 'notice') {
+      if (a.step === 'ok' && d < a.joinDate && d - (a.lastCheckin ?? d) >= 7) { a.checkins++; a.lastCheckin = d; say(a, 'agent', checkinText(a), 'Before you join Acme'); ev(a, 'agent', 'Notice-period check-in sent'); }
+      const lastHeard = Math.max(a.lastReply ?? -999, a.acceptDay ?? -999);
+      if (a.step === 'ok' && !a.quietFlag && a.checkins > 0 && d - lastHeard >= 7) {
+        a.quietFlag = true; a.step = 'risk'; edge(19);
+        addTask({type:'risk', appId:a.id, roleId:a.roleId, title:`${P(a.pid).name} has gone quiet before joining`, why:`No reply for ${d - lastHeard} days. Joins ${fd(a.joinDate)}.`});
+        ev(a, 'agent', 'Quiet for 7+ days before joining: passed to a HireLoop recruiter');
+      }
+    }
+  }
+  toast(`It's now ${fd(d)}`);
+};
+
+/* --- Roles --- */
+X.findCandidates = v => {
+  const r = R(v);
+  if (r.status !== 'Open') { toast(`This role is ${r.status.toLowerCase()}.`); return; }
+  const pool = /product manager/i.test(r.title) ? POOL_PM : POOL_GEN;
+  const have = new Set(S.apps.filter(a => a.roleId === r.id).map(a => a.pid));
+  const added = [], skipped = [], merged = [];
+  for (const pid of pool) {
+    if (have.has(pid)) continue;
+    const p = P(pid);
+    if (activeFlag(p)) { skipped.push(p.name); edge(1); continue; }
+    if (p.generic) p.headline = `${r.title}, ${p.co}`;
+    if (p.generic && !p.scr.exp) p.scr.exp = Math.round((r.min + r.max) / 2);
+    const a = mkApp(pid, r.id, 'sourced', 'review', {reviewed:false});
+    if (p.src.length > 1) { merged.push(p.name); edge(2); a.tags.push('Duplicate merged'); }
+    const other = S.apps.find(x => x.pid === pid && x.roleId !== r.id && isActive(x));
+    if (other) { a.tags.push('Also in ' + R(other.roleId).title); edge(3); }
+    if (p.feedback.length) { a.tags.push('Past feedback'); edge(4); }
+    ev(a, 'agent', `Found on ${p.src.join(' and ')}. Match ${p.match}%.`);
+    added.push(a);
+  }
+  r.runs++;
+  if (!added.length) { logRole(r.id, 'agent', 'Searched again: no new matches.'); toast('No new matches.'); return; }
+  skipped.forEach(n => r.skipped.push({name:n, d:S.day}));
+  logRole(r.id, 'agent', `Searched Naukri, LinkedIn, referrals and past applicants: ${added.length} added${skipped.length ? `, ${skipped.length} skipped (flagged)` : ''}${merged.length ? `, ${merged.length} duplicate merged` : ''}.`);
+  addTask({type:'review', roleId:r.id, title:`Check ${added.length} new candidates`, why:`${r.title}. Remove misfits before the AI messages them.`});
+  ui.roleTab = 'pipeline';
+  toast(`${added.length} found${skipped.length ? `, ${skipped.length} skipped (flagged)` : ''}. A HireLoop recruiter checks them next.`);
+};
+X.roleStatus = v => {
+  const [id, st] = two(v); const r = R(id);
+  if (st === 'hold') {
+    r.status = 'On hold';
+    S.apps.filter(a => a.roleId === id && isActive(a)).forEach(a => { a.held = true; if (a.msgs.length) say(a, 'agent', `Quick update, ${first(a)}: Acme has paused this role. I'll let you know when it reopens.`, 'Update on your application'); ev(a, 'company', 'Role on hold: AI paused'); });
+    logRole(id, 'company', 'Role on hold. AI paused.'); toast('Role paused. Candidates told.');
+  } else if (st === 'open') {
+    r.status = 'Open';
+    S.apps.filter(a => a.roleId === id && isActive(a)).forEach(a => { a.held = false; if (a.msgs.length) say(a, 'agent', `Good news, ${first(a)}: Acme has reopened the ${r.title} role.`, 'Update on your application'); ev(a, 'company', 'Role reopened'); });
+    logRole(id, 'company', 'Role reopened.'); toast('Role reopened.');
+  } else if (st === 'close') {
+    r.status = 'Closed';
+    S.apps.filter(a => a.roleId === id && isActive(a)).forEach(a => { a.held = false; closeApp(a, 'Role closed', 'company', {msg:`Hi ${first(a)}, Acme has closed the ${r.title} role, so we're ending this process. Thank you for your time.\n\nCan we keep you in mind for future roles?`}); });
+    logRole(id, 'company', 'Role closed. Everyone still active was told.'); toast('Role closed.');
+  }
+};
+X.sendShortlist = v => {
+  const r = R(v);
+  const apps = S.apps.filter(a => a.roleId === v && a.status === 'ready');
+  if (!apps.length) return;
+  apps.forEach(a => { a.status = 'shortlist_hm'; a.step = 'shortlist'; a.waitingSince = S.day; a.rem = 0; ev(a, 'company', `${RN(r)} sent the shortlist to the ${r.hm}`); });
+  slack({hm:r.hm, type:'shortlist', roleId:v, appIds:apps.map(a => a.id), decided:{}});
+  toast(`Sent to the ${r.hm} on Slack.`);
+};
+X.decide = v => {
+  const [id, yes] = two(v); const a = A(id), r = R(a.roleId);
+  if (yes === '1') { a.status = 'ready'; a.step = 'ready'; ev(a, 'company', `${RN(r)} included anyway (${a.tags.filter(t => /budget|notice|Location/.test(t)).join(', ').toLowerCase()})`); toast(`${first(a)} added to the shortlist.`); }
+  else { closeApp(a, 'Closed after screening', 'company'); toast(`${first(a)} closed politely.`); }
+};
+X.approvePending = v => {
+  const a = A(v), k = a.pending; a.pending = null;
+  ev(a, 'company', `${RN(R(a.roleId))} approved: ${KIND_LABEL[k]}`);
+  if (k === 'outreach') doOutreach(a); else if (k === 'booking') sendSlots(a); else if (k === 'takehome') sendTakehome(a);
+  toast('Approved.');
+};
+X.approveOutreach = v => { S.apps.filter(a => a.roleId === v && a.pending === 'outreach').forEach(a => { a.pending = null; ev(a, 'company', `${RN(R(v))} approved first message`); doOutreach(a); }); toast('Approved. Messages sent.'); };
+X.nudge = v => { const a = A(v); a.rem = 1; a.waitingSince = S.day - 1; const who = (a.status === 'interviewing' && a.step === 'feedback') ? stageHM(a) : R(a.roleId).hm; slack({hm:who, type:'reminder', appId:a.id, roleId:a.roleId, about:'response'}); ev(a, 'company', `${meName()} nudged the ${who} again`); toast('Nudge sent.'); };
+X.reopen = v => { const a = A(v); a.status = a.screen ? 'ready' : 'contacted'; a.step = a.screen ? 'ready' : 'awaiting'; a.closed = null; a.consentAsk = false; a.declineAsk = false; a.suggestFlag = false; if (a.status === 'contacted') { a.firstOut = S.day; a.followups = 0; } ev(a, 'company', `${meName()} reopened this candidate`); toast(`${first(a)} reopened.`); };
+
+/* --- Offers --- */
+X.offerModal = v => { ui.modal = {type:'offer', appId:v}; };
+X.submitOffer = v => {
+  const a = A(v), r = R(a.roleId);
+  const ctc = Number(document.getElementById('of-ctc').value), days = Number(document.getElementById('of-days').value), note = document.getElementById('of-note').value.trim();
+  if (!ctc || ctc < 1) { toast('Enter the CTC.'); return; }
+  a.offer = {ctc, join:S.day + days, note, comment:null};
+  if (ctc > r.max) { a.step = 'admin'; edge(16); ev(a, 'company', `${RN(r)} drafted ${lpa(ctc)}, above the ${lpa(r.max)} budget. Sent to the Head of Talent.`); toast('Above budget: sent to the Head of Talent.'); }
+  else { a.step = 'hm'; a.waitingSince = S.day; a.rem = 0; slack({hm:r.hm, type:'offer', appId:a.id, roleId:r.id}); ev(a, 'company', `${RN(r)} drafted the offer: ${lpa(ctc)}, joining ${fd(a.offer.join)}`); toast(`Sent to the ${r.hm} for approval.`); }
+  ui.modal = null;
+};
+X.adminOffer = v => {
+  const [id, yes] = two(v); const a = A(id), r = R(a.roleId);
+  edge(16);
+  if (yes === '1') { a.step = 'hm'; a.waitingSince = S.day; a.rem = 0; slack({hm:r.hm, type:'offer', appId:a.id, roleId:r.id}); ev(a, 'company', `Head of Talent approved the above-budget offer (${lpa(a.offer.ctc)})`); toast(`Approved. Sent to the ${r.hm}.`); }
+  else { a.step = 'draft'; a.offer.comment = `Head of Talent: keep it within ${lpa(r.max)}.`; ev(a, 'company', 'Head of Talent sent the offer back'); toast(`Sent back to ${RN(r)}.`); }
+};
+X.approveDate = v => {
+  const [id, yes] = two(v); const a = A(id), r = R(a.roleId);
+  if (yes === '1') { a.joinDate = a.newJoin; say(a, 'agent', `Confirmed, ${first(a)}: you now join on ${fd(a.joinDate)}.`, 'New joining date confirmed'); ev(a, 'company', `${RN(r)} approved the new joining date: ${fd(a.joinDate)}`); }
+  else { say(a, 'agent', `Hi ${first(a)}, Acme needs you to join on ${fd(a.joinDate)} as planned. Tell me if that's a problem.`, 'About your joining date'); ev(a, 'company', `${RN(r)} kept the original joining date`); }
+  a.step = 'ok'; a.newJoin = null; a.lastReply = S.day; edge(20);
+};
+X.markJoined = v => {
+  const a = A(v), r = R(a.roleId);
+  a.status = 'joined'; a.step = 'joined'; a.joinDate = S.day; r.filled++;
+  ev(a, 'company', 'Joined Acme. Sent to Keka. Placement fee due.');
+  say(a, 'agent', `Welcome to your first day at Acme, ${first(a)}!`, 'Welcome to Acme');
+  closeOpenWork(a);
+  if (r.filled >= r.seats) { r.status = 'Filled'; logRole(r.id, 'company', 'All seats filled. Search stopped.'); }
+  toast(`${P(a.pid).name} joined. ${r.filled} of ${r.seats} filled.`);
+};
+X.didNotJoin = v => { const a = A(v); edge(20); closeApp(a, 'Did not join on the day', 'company', {silent:true}); toast('Marked as did not join. Seat still open.'); };
+
+/* --- Flags --- */
+X.flagModal = v => { const [pid, appId] = two(v); ui.modal = {type:'flag', pid, appId:appId || null}; };
+X.submitFlag = v => {
+  const [pid, appId] = two(v); const p = P(pid);
+  const reason = document.getElementById('fl-reason').value, note = document.getElementById('fl-note').value.trim();
+  if (!note) { toast('Add a short note.'); return; }
+  p.flags.push({reason, note, by:meName(), d:S.day, review:S.day + 365, active:true});
+  edge(14);
+  if (appId) { const a = A(appId); a.suggestFlag = false; ev(a, 'company', `${meName()} flagged: ${reason}`); }
+  ui.modal = null; toast(`${p.name} won't appear in Acme's shortlists again.`);
+};
+X.removeFlag = v => { const p = P(v); const f = activeFlag(p); if (!f) return; f.active = false; f.removedBy = ADMIN; f.removedD = S.day; toast(`Flag removed for ${p.name}.`); };
+
+/* --- Candidate --- */
+X.cPick = v => { ui.cand = v; ui.thread = null; ui.ask = null; ui.papp = null; };
+X.cThread = v => { ui.thread = v; ui.ask = null; };
+X.cBack = () => { ui.thread = null; ui.ask = null; };
+X.cTab = v => { ui.ctab = v; ui.ask = null; };
+X.cApp = v => { ui.papp = v; };
+X.c_yes = v => { const a = A(two(v)[0]); say(a, 'cand', "Yes, I'm interested!"); a.status = 'screening'; a.step = 'questions'; ev(a, 'cand', 'Replied: interested'); say(a, 'agent', `Great, ${first(a)}! A few quick questions (2 minutes).\n\nYou can also see all your applications on your HireLoop page.`, 'A few quick questions'); };
+X.c_no = v => { const a = A(two(v)[0]); say(a, 'cand', 'Not interested right now, thanks.'); edge(6); closeApp(a, 'Not interested', 'cand', {msg:`No problem, ${first(a)}. Thanks for letting me know.\n\nCan we reach out if a better-fit role opens up?`}); };
+X.c_stop = v => { const a = A(two(v)[0]); say(a, 'cand', 'Stop'); edge(6); closeApp(a, 'Asked to stop messages', 'cand', {silent:true}); say(a, 'agent', "Done. You won't hear from us again."); P(a.pid).consent = false; };
+X.c_ask = v => { ui.ask = two(v)[0]; };
+X.c_askclose = () => { ui.ask = null; };
+X.c_q = v => {
+  const [id, q] = two(v); const a = A(id), r = R(a.roleId); ui.ask = null;
+  if (q === 'mode') { say(a, 'cand', 'Is this role hybrid?'); say(a, 'agent', `Yes: ${r.mode}, in ${r.location}.`); ev(a, 'agent', 'Answered a question on work mode'); }
+  else if (q === 'salary') { say(a, 'cand', 'What is the salary range?'); say(a, 'agent', `Acme's approved range is ${lpa(r.min)} to ${lpa(r.max)}. The final number depends on the interviews.`); ev(a, 'agent', 'Shared the approved salary range'); }
+  else { say(a, 'cand', 'Do you offer relocation support?'); say(a, 'agent', "Good question. I don't want to guess, so I'm checking with Acme. You'll hear back today."); edge(9); addTask({type:'question', appId:a.id, roleId:a.roleId, q:'Do you offer relocation support?', title:`Answer ${P(a.pid).name}'s question`, why:'"Do you offer relocation support?" The AI didn\'t know.'}); ev(a, 'agent', 'Couldn\'t answer a question: passed to a HireLoop recruiter'); }
+};
+X.c_screen = v => {
+  const a = A(two(v)[0]), r = R(a.roleId);
+  const notice = Number(document.getElementById('sc-notice').value), exp = Number(document.getElementById('sc-exp').value), loc = document.getElementById('sc-loc').value, why = document.getElementById('sc-why').value;
+  if (!exp) { toast('Enter your expected CTC.'); return; }
+  a.screen = {notice, exp, loc, why};
+  say(a, 'cand', `Notice: ${notice} days\nExpected: ${lpa(exp)}\nOkay with ${r.location}: ${loc === 'yes' ? 'Yes' : 'No'}\nWhy: ${why}`);
+  const issues = [];
+  if (exp > r.max) { issues.push('Over budget'); edge(7); }
+  if (notice > r.maxNotice) { issues.push('Long notice'); edge(8); }
+  if (loc !== 'yes') issues.push('Location mismatch');
+  a.tags = a.tags.filter(t => !['Over budget','Long notice','Location mismatch'].includes(t)).concat(issues);
+  if (issues.length) { a.step = 'decide'; ev(a, 'agent', `Screening done. Needs ${RN(r)}'s call: ${issues.join(', ').toLowerCase()}`); say(a, 'agent', `Thanks, ${first(a)}. I'm checking a couple of details with the team. Back to you within 2 working days.`, 'Thanks for your answers'); }
+  else { a.status = 'ready'; a.step = 'ready'; ev(a, 'agent', 'Screening done: ready for shortlist'); say(a, 'agent', `Thanks, ${first(a)}. I'm sharing your profile with the hiring team. Back to you within 2 working days.`, 'Thanks for your answers'); }
+};
+X.c_slot = v => { const [id, i] = two(v); const a = A(id), s = a.slots[Number(i)], st = stage(a); say(a, 'cand', `${fd(s.d)}, ${s.time} works.`); bookSlot(a, s); say(a, 'agent', `Booked: ${st.name.toLowerCase()} with Acme's ${st.by}, ${fd(s.d)} at ${s.time}. Invite sent. I'll remind you a day before.`, `Confirmed: ${st.name}`); ev(a, 'cand', `Picked ${fd(s.d)}, ${s.time} for ${st.name}`); };
+function reschedule(a, text){
+  say(a, 'cand', text); a.resched++; edge(11); a.slot = null;
+  S.inbox.forEach(m => { if (m.type === 'brief' && m.appId === a.id) m.cancelled = true; });
+  if (a.resched >= 2) { a.step = 'resched_help'; say(a, 'agent', "Sorry it's been tricky. A recruiter from our team will call you to find a time."); addTask({type:'resched', appId:a.id, roleId:a.roleId, title:`Find an interview time with ${P(a.pid).name}`, why:'Second reschedule. Book it by phone.'}); ev(a, 'agent', 'Second reschedule: passed to a HireLoop recruiter'); }
+  else { ev(a, 'cand', 'Asked for other times'); sendSlots(a, true); }
+}
+X.c_noslot = v => reschedule(A(two(v)[0]), "None of these work for me.");
+X.c_resched = v => reschedule(A(two(v)[0]), 'Something came up. Can we reschedule?');
+X.c_thgot = v => { const a = A(two(v)[0]); say(a, 'cand', 'Got it, thanks!'); ev(a, 'cand', 'Confirmed the take-home arrived'); };
+X.c_thmore = v => { const a = A(two(v)[0]); say(a, 'cand', 'Could I get 3 more days?'); a.thDue += 3; a.thRem = 0; edge(15); say(a, 'agent', `Sure. New deadline: ${fd(a.thDue)}.`); ev(a, 'cand', `Asked for more time. Now due ${fd(a.thDue)}`); };
+X.c_thsub = v => { const a = A(two(v)[0]), r = R(a.roleId); say(a, 'cand', 'Submitted: docs.example.com/my-assignment'); a.step = 'th_review'; a.waitingSince = S.day; a.rem = 0; ev(a, 'cand', 'Submitted the take-home'); slack({hm:r.hm, type:'scorecard', appId:a.id, roleId:r.id, stage:stage(a).name, kind:'takehome'}); ev(a, 'agent', `Sent it to the ${r.hm} for review`); say(a, 'agent', 'Received, thank you! Back to you within 2 working days.'); };
+X.c_accept = v => { const a = A(two(v)[0]); say(a, 'cand', 'I accept the offer!'); a.status = 'notice'; a.step = 'ok'; a.joinDate = a.offer.join; a.acceptDay = S.day; a.lastCheckin = S.day; a.paused = false; ev(a, 'cand', 'Accepted the offer'); say(a, 'agent', `Wonderful news, ${first(a)}! Welcome to Acme. You join on ${fd(a.joinDate)}.\n\nI'll stay in touch until then.`, 'Welcome to Acme'); closeOpenWork(a); };
+X.c_decline = v => { const a = A(two(v)[0]); say(a, 'cand', "I've decided to decline the offer."); edge(18); closeApp(a, 'Declined the offer', 'cand', {msg:`Thanks for letting me know, ${first(a)}. May I ask why? It helps Acme improve.`, consent:false}); a.declineAsk = true; };
+X.c_reason = v => { const [id, k] = two(v); const a = A(id); const txt = {another:'I took another offer.', comp:'The pay was lower than I wanted.', fit:"The role wasn't quite right."}[k]; say(a, 'cand', txt); a.closed.detail = txt; a.declineAsk = false; a.consentAsk = true; ev(a, 'cand', `Reason: ${txt}`); say(a, 'agent', "Thank you. Can we keep you in mind for future roles?"); };
+X.c_counter = v => { const a = A(two(v)[0]); say(a, 'cand', 'I have another offer and need time to think.'); edge(17); a.step = 'negotiation'; a.paused = true; say(a, 'agent', 'Thanks for being open. A recruiter from our team will call you within the hour.'); addTask({type:'negotiation', appId:a.id, roleId:a.roleId, title:`${P(a.pid).name} has another offer`, why:`Our offer: ${lpa(a.offer.ctc)}. AI paused. Call within 1 hour.`}); ev(a, 'agent', 'Competing offer: AI paused, passed to a HireLoop recruiter'); };
+X.c_person = v => { const a = A(two(v)[0]); say(a, 'cand', 'Can I talk to a person?'); say(a, 'agent', 'Of course. A recruiter from our team will call you shortly.'); addTask({type:'call', appId:a.id, roleId:a.roleId, title:`Call ${P(a.pid).name}`, why:'Asked to talk to a person.'}); ev(a, 'agent', 'Asked for a person: passed to a HireLoop recruiter'); };
+X.c_ngood = v => { const a = A(two(v)[0]); say(a, 'cand', 'All good, see you soon!'); ev(a, 'cand', 'Replied: all good'); };
+X.c_nre = v => { const a = A(two(v)[0]); say(a, 'cand', "Honestly, I'm rethinking this. My company made a counter-offer."); edge(19); a.step = 'risk'; say(a, 'agent', `Thanks for telling us, ${first(a)}. A recruiter from our team will call you today.`); addTask({type:'risk', appId:a.id, roleId:a.roleId, title:`${P(a.pid).name} is rethinking (counter-offer)`, why:`Joins ${fd(a.joinDate)}.`}); ev(a, 'agent', 'Hesitation before joining: passed to a HireLoop recruiter'); };
+X.c_ndate = v => { const a = A(two(v)[0]); say(a, 'cand', 'Can I move my joining date by 2 weeks?'); edge(20); a.step = 'datechange'; a.newJoin = a.joinDate + 14; say(a, 'agent', "Let me check with Acme."); ev(a, 'cand', `Asked to join on ${fd(a.newJoin)} instead`); };
+X.c_consent = v => { const [id, yes] = two(v); const a = A(id), p = P(a.pid); a.consentAsk = false;
+  if (yes === '1') { say(a, 'cand', 'Yes, keep me in mind.'); p.consent = true; say(a, 'agent', "Thank you! We'll be in touch when something fits."); ev(a, 'cand', 'Joined the talent pool'); }
+  else { say(a, 'cand', 'No, thanks.'); p.consent = false; say(a, 'agent', "Understood. We won't contact you again."); ev(a, 'cand', 'Declined future contact'); } };
+
+/* --- Hiring manager (Slack) --- */
+X.hmAs = v => { ui.hm = v; ui.focus = null; };
+X.slackFocus = v => { ui.focus = v; };
+X.hmShort = v => {
+  const [mid, aid, yes] = two(v); const m = S.inbox.find(x => x.id === mid), a = A(aid), r = R(a.roleId), p = P(a.pid);
+  m.decided[aid] = yes === '1' ? 'yes' : 'no';
+  if (yes === '1') { a.status = 'interviewing'; a.stageIdx = 0; a.rem = 0; ev(a, 'hm', `${r.hm} said yes`); startStage(a); }
+  else { p.feedback.push({roleId:r.id, roleTitle:r.title, stage:'Shortlist', decision:'no', notes:'', by:r.hm, d:S.day}); closeApp(a, 'Hiring manager said no at shortlist', 'hm'); }
+  if (m.appIds.every(id => m.decided[id])) { m.done = true; m.result = 'Done'; }
+  S.inbox.forEach(x => { if (!x.done && x.type === 'reminder' && x.appId === aid) { x.done = true; x.result = 'Done'; } });
+  toast(yes === '1' ? `Yes. The AI is booking ${first(a)}'s next round.` : `No. ${first(a)} gets a polite message.`);
+};
+X.hmPick = v => { const [mid, dec] = two(v); ui.dec[mid] = dec; ui.focus = mid; };
+X.hmScore = v => {
+  const m = S.inbox.find(x => x.id === v), a = A(m.appId), r = R(a.roleId), p = P(a.pid);
+  const dec = ui.dec[v];
+  const notesEl = document.getElementById('sc-notes-' + v), flagEl = document.getElementById('sc-flag-' + v), reasonEl = document.getElementById('sc-reason-' + v);
+  const notes = notesEl ? notesEl.value.trim() : '';
+  const flag = !!(flagEl && flagEl.checked);
+  if (!dec) { toast('Pick a decision first.'); return; }
+  if (flag && !notes) { toast('Add a note explaining the flag.'); return; }
+  p.feedback.push({roleId:r.id, roleTitle:r.title, stage:m.stage, decision:dec, notes, by:m.hm, d:S.day});
+  m.done = true; m.result = DEC[dec];
+  S.inbox.forEach(x => { if (!x.done && x.type === 'reminder' && x.appId === a.id) { x.done = true; x.result = 'Done'; } });
+  ev(a, 'hm', `${m.hm}: ${m.stage}, ${DEC[dec].toLowerCase()}`);
+  if (dec === 'yes' || dec === 'strong_yes') {
+    a.stageIdx++;
+    if (a.stageIdx < r.playbook.length) startStage(a);
+    else { a.status = 'offer'; a.step = 'draft'; a.waitingSince = null; a.rem = 0; ev(a, 'agent', 'All rounds cleared. Ready for an offer.'); say(a, 'agent', `Great news, ${first(a)}: you cleared all rounds! The team is preparing your offer.`, 'Great news from Acme'); }
+  } else {
+    closeApp(a, `Not selected after ${m.stage}`, 'hm');
+    if (flag && dec === 'strong_no') { const reason = reasonEl.value; p.flags.push({reason, note:notes, by:m.hm, d:S.day, review:S.day + 365, active:true}); edge(14); ev(a, 'hm', `${m.hm} flagged: ${reason}`); }
+  }
+  delete ui.dec[v]; ui.focus = null;
+  toast('Feedback saved.');
+};
+X.hmChange = v => { ui.chg[v] = true; ui.focus = v; };
+X.hmOffer = v => {
+  const [mid, yes] = two(v); const m = S.inbox.find(x => x.id === mid), a = A(m.appId);
+  if (yes === '1') { m.done = true; m.result = 'Approved'; ev(a, 'hm', `${m.hm} approved the offer`); sendOffer(a); toast('Approved. Offer sent.'); }
+  else { const el = document.getElementById('of-change-' + mid); const c = el ? el.value.trim() : ''; if (!c) { toast('Say what should change.'); return; } m.done = true; m.result = 'Changes asked'; a.step = 'draft'; a.offer.comment = `${m.hm}: ${c}`; ev(a, 'hm', `${m.hm} asked for changes: ${c}`); toast(`Sent back to ${RN(R(a.roleId))}.`); }
+  S.inbox.forEach(x => { if (!x.done && x.type === 'reminder' && x.appId === a.id) { x.done = true; x.result = 'Done'; } });
+};
+X.openReminder = v => { const m = S.inbox.find(x => x.id === v); const t = S.inbox.find(x => !x.done && x.type !== 'reminder' && x.type !== 'brief' && (x.appId === m.appId || (x.appIds || []).includes(m.appId))); ui.focus = t ? t.id : null; };
+
+/* --- HireLoop recruiter --- */
+X.openTask = v => { ui.task = v; };
+X.tf = (v, el) => { ui.tf[el.dataset.k] = v; ui.task = null; };
+X.reassign = (v, el) => { const t = S.tasks.find(x => x.id === el.dataset.k); t.assignee = v; toast(`Reassigned to ${v}.`); };
+X.resolve = v => {
+  const [tid, out] = two(v); const t = S.tasks.find(x => x.id === tid); const a = t.appId ? A(t.appId) : null; const r = t.roleId ? R(t.roleId) : null;
+  const note = (document.getElementById('t-note') || {}).value || '';
+  if (t.ext) { t.done = true; t.doneD = S.day; t.outcome = note.trim() ? `Done: ${note.trim()}` : 'Done'; ui.task = null; toast(`Done. ${t.client} can see the update.`); return; }
+  switch (t.type) {
+    case 'intake':
+      if (!note.trim()) { toast('Add the notes first.'); return; }
+      r.intake = note.trim(); logRole(r.id, 'team', `${t.assignee} added notes from a call with the ${r.hm}`); break;
+    case 'review': {
+      const apps = S.apps.filter(x => x.roleId === r.id && x.status === 'sourced' && !x.reviewed);
+      let kept = 0;
+      apps.forEach(x => { const box = document.getElementById('keep-' + x.id); const keep = box ? box.checked : true; x.reviewed = true;
+        if (!keep) { closeApp(x, 'Removed in quality check', 'team', {silent:true}); return; }
+        kept++; ev(x, 'team', 'Approved in quality check'); if (gate(x, 'outreach')) doOutreach(x); });
+      logRole(r.id, 'team', `${t.assignee} approved ${kept} of ${apps.length}. Messages sent.`); t.outcome = `Kept ${kept} of ${apps.length}`; break; }
+    case 'question':
+      if (!note.trim()) { toast('Write the answer first.'); return; }
+      say(a, 'team', note.trim()); ev(a, 'team', `Answered: "${t.q}"`); break;
+    case 'receipt': ev(a, 'team', 'Called: take-home received, no questions'); break;
+    case 'th_missing':
+      if (out === 'extend') { a.thDue = S.day + 3; a.thRem = 0; say(a, 'team', `Hi ${first(a)}, as discussed, your new deadline is ${fd(a.thDue)}. Good luck! – ${t.assignee}, HireLoop`); ev(a, 'team', `Deadline extended to ${fd(a.thDue)}`); }
+      else closeApp(a, "Didn't send the take-home", 'team'); break;
+    case 'resched':
+      if (out === 'book') { const s = {d:S.day + 2, time:'12:00'}; bookSlot(a, s); say(a, 'team', `Hi ${first(a)}, as discussed, you're booked for ${fd(s.d)} at 12:00. – ${t.assignee}, HireLoop`); ev(a, 'team', `Booked ${fd(s.d)}, 12:00 by phone`); }
+      else closeApp(a, 'Withdrew during scheduling', 'team', {silent:true}); break;
+    case 'negotiation':
+      if (out === 'won') { a.offer.ctc += 2; a.paused = false; a.status = 'notice'; a.step = 'ok'; a.joinDate = a.offer.join; a.acceptDay = S.day; a.lastCheckin = S.day; say(a, 'team', `Great speaking with you, ${first(a)}. Confirming the revised offer of ${lpa(a.offer.ctc)}. Welcome to Acme! – ${t.assignee}, HireLoop`); ev(a, 'team', `Negotiated: ${lpa(a.offer.ctc)} accepted`); }
+      else closeApp(a, 'Declined after negotiation', 'team', {silent:true}); break;
+    case 'risk':
+      if (out === 'ok') { a.step = 'ok'; a.quietFlag = false; a.lastReply = S.day; say(a, 'team', `Lovely chatting today, ${first(a)}. See you on ${fd(a.joinDate)}! – ${t.assignee}, HireLoop`); ev(a, 'team', 'Called: still joining'); }
+      else closeApp(a, 'Withdrew before joining', 'team', {silent:true}); break;
+    case 'call': ev(a, 'team', 'Called the candidate'); break;
+  }
+  t.done = true; t.doneD = S.day; t.outcome = t.outcome || ({extend:'Deadline extended', drop:'Closed', book:'Booked by phone', withdrew:'Withdrew', won:'Revised offer accepted', lost:'Lost', ok:'Still joining'}[out] || 'Done');
+  ui.task = null; toast('Done. Acme can see the update.');
+};
+
+/* --- New role --- */
+X.newRole = () => {
+  if (!portal()) ui.persona = 'rec1';
+  const owner = isAdmin() ? 'rec1' : ui.persona;
+  ui.wiz = {step:1, d:{owner, tpl:'pm', title:'Product Manager', seats:10, min:30, max:40, maxNotice:90, location:'Bengaluru', mode:'hybrid, 3 days in office', targetDays:150, hm:HPROD, req:'5+ years in product. Fintech or payments. Has shipped AI or ML features. Comfortable with data.', stages:clone(TEMPLATES.pm.stages), auto:{outreach:'auto', booking:'auto', takehome:'auto'}}};
+  ui.modal = {type:'wizard'};
+};
+X.wzNext = () => {
+  const d = ui.wiz.d;
+  if (ui.wiz.step === 1) { if (!String(d.title).trim()) { toast('Add a role title.'); return; } if (!(d.seats >= 1)) { toast('Seats must be at least 1.'); return; } if (!(d.max >= d.min)) { toast('Max budget must be at least the min.'); return; } }
+  if (ui.wiz.step === 2 && !String(d.req).trim()) { toast('Describe who you need.'); return; }
+  if (ui.wiz.step === 3) { if (!d.stages.length) { toast('Add at least one round.'); return; } if (d.stages.some(s => !String(s.name).trim())) { toast('Every round needs a name.'); return; } }
+  ui.wiz.step = Math.min(4, ui.wiz.step + 1);
+};
+X.wzBack = () => { ui.wiz.step = Math.max(1, ui.wiz.step - 1); };
+X.wzSt = v => {
+  const [op, i] = two(v); const s = ui.wiz.d.stages, n = Number(i);
+  if (op === 'up' && n > 0) [s[n - 1], s[n]] = [s[n], s[n - 1]];
+  if (op === 'down' && n < s.length - 1) [s[n + 1], s[n]] = [s[n], s[n + 1]];
+  if (op === 'del') s.splice(n, 1);
+  if (op === 'add') s.push({name:'New round', type:'interview', by:ui.wiz.d.hm});
+};
+X.wzLaunch = () => {
+  const d = ui.wiz.d;
+  const r = {id:nid('r'), company:'Acme', owner:d.owner, title:String(d.title).trim(), seats:Number(d.seats), filled:0, min:Number(d.min), max:Number(d.max), maxNotice:Number(d.maxNotice), location:d.location, mode:d.mode, target:S.day + Number(d.targetDays), hm:d.hm, playbook:clone(d.stages), autonomy:clone(d.auto), req:d.req, intake:'', status:'Open', runs:0, skipped:[], created:S.day};
+  S.roles.push(r);
+  logRole(r.id, 'company', `${RN(r)} created the role: ${r.seats} seats, ${lpa(r.min)}–${lpa(r.max)}, ${r.playbook.length} rounds`);
+  addTask({type:'intake', roleId:r.id, title:`Intake call with the ${r.hm}: ${r.title}`, why:'15 minutes to learn what "great" looks like.'});
+  ui.modal = null; ui.wiz = null; ui.view = 'role'; ui.roleId = r.id; ui.roleTab = 'pipeline';
+  toast('Role created. Next: Find candidates.');
+};
+
+/* --- Demo shortcuts --- */
+X.demoHappened = v => { const a = A(v); interviewHappened(a); toast(`Done. Feedback request sent to the ${stageHM(a)}.`); };
+X.demoNoShow = v => {
+  const a = A(v), st = stage(a); a.noShows++; edge(12);
+  ev(a, 'agent', `Missed the ${st.name.toLowerCase()}`);
+  S.inbox.forEach(m => { if (m.type === 'brief' && m.appId === a.id) m.cancelled = true; });
+  if (a.noShows >= 2) { closeApp(a, 'No-show twice', 'agent', {msg:`Hi ${first(a)}, we missed you again today, so Acme has closed this application. All the best.`, consent:false}); a.suggestFlag = true; toast('Second no-show: closed.'); }
+  else { say(a, 'agent', `Hi ${first(a)}, we missed you today. Everything okay? If you'd still like to go ahead, here are new times.`); a.slot = null; sendSlots(a, true); toast('No-show. One rebooking offered.'); }
+};
+
+/* ============ View helpers ============ */
+const btn = (label, a, v, cls, dis) => `<button class="btn ${cls || ''}" data-a="${a}" data-v="${esc(v ?? '')}"${dis ? ' disabled' : ''}>${esc(label)}</button>`;
+const sbtn = (label, a, v, cls, pressed) => `<button class="sbtn ${cls || ''}" data-a="${a}" data-v="${esc(v ?? '')}"${pressed !== undefined ? ` aria-pressed="${pressed}"` : ''}>${esc(label)}</button>`;
+const head = (title, line, right) => `<div class="phead"><div><h1>${esc(title)}</h1><p>${esc(line)}</p></div>${right || ''}</div>`;
+const actorTag = actor => `<span class="who" style="color:${ACT[actor].c}">${ACT[actor].label}</span>`;
+const ownerTag = r => isAdmin() && r && RECS[r.owner] ? `<span class="owner">${RECS[r.owner].name}</span>` : '';
+function waitOn(a){
+  const r = R(a.roleId);
+  if (a.held) return ['company','Role paused'];
+  if (a.pending) return ['company',`Needs ${RN(r)}'s approval`];
+  switch (a.status) {
+    case 'sourced': return ['team','HireLoop checking'];
+    case 'contacted': return ['cand', a.followups ? `No reply (${a.followups} follow-up${a.followups > 1 ? 's' : ''})` : 'Waiting for reply'];
+    case 'screening': return a.step === 'decide' ? ['company',`${RN(r)}'s call`] : ['cand','Answering questions'];
+    case 'ready': return ['company','Ready to send'];
+    case 'shortlist_hm': return ['hm',`Hiring manager deciding${a.rem ? ' (late)' : ''}`];
+    case 'interviewing':
+      if (a.step === 'scheduling') return ['cand','Picking a time'];
+      if (a.step === 'resched_help') return ['team','HireLoop finding a time'];
+      if (a.step === 'scheduled') return ['agent',`Interview ${fds(a.slot.d)}, ${a.slot.time}`];
+      if (a.step === 'feedback') return ['hm',`Feedback due${a.rem ? ' (late)' : ''}`];
+      if (a.step === 'takehome') return ['cand',`Take-home due ${fds(a.thDue)}`];
+      if (a.step === 'th_review') return ['hm',`Take-home review${a.rem ? ' (late)' : ''}`];
+      return ['agent','In progress'];
+    case 'offer': return ({draft:['company', a.offer && a.offer.comment ? 'Changes asked' : 'Draft offer'], admin:['company','Needs Head of Talent'], hm:['hm',`Hiring manager approving${a.rem ? ' (late)' : ''}`], sent:['cand','Deciding on offer'], negotiation:['team','HireLoop negotiating']})[a.step] || ['agent','Offer'];
+    case 'notice':
+      if (a.step === 'datechange') return ['company','Approve new date'];
+      if (S.day >= a.joinDate) return ['company','Joining today'];
+      if (a.step === 'risk') return ['team','HireLoop calling'];
+      return ['agent',`Joins ${fds(a.joinDate)}`];
+    case 'joined': return ['company',`Joined ${fds(a.joinDate)}`];
+    case 'closed': return ['company', a.closed.reason];
+  }
+  return ['agent',''];
+}
+const waitHTML = a => { const [who, txt] = waitOn(a); return `<span class="wait" style="color:${ACT[who].c}"><i style="background:${ACT[who].c}"></i>${esc(txt)}</span>`; };
+const tagHTML = t => `<span class="tag ${/Over budget|Long notice|Location/.test(t) ? 'warn' : ''}">${esc(t)}</span>`;
+
+function attention(scope){
+  const admin = scope === 'admin';
+  const roles = scope === 'admin' ? S.roles : S.roles.filter(r => r.owner === scope);
+  const ids = new Set(roles.map(r => r.id));
+  const items = [];
+  roles.forEach(r => {
+    const ready = S.apps.filter(a => a.roleId === r.id && a.status === 'ready');
+    if (ready.length) items.push({r, tone:'company', text:`Send ${ready.length} candidate${ready.length > 1 ? 's' : ''} to the ${r.hm}`, sub:r.title, acts:[['Send shortlist','sendShortlist',r.id,'primary'],['View','openRole',r.id,'']]});
+    const po = S.apps.filter(a => a.roleId === r.id && a.pending === 'outreach');
+    if (po.length) items.push({r, tone:'agent', text:`Approve first messages to ${po.length} candidates`, sub:`${r.title} · you asked the AI to check with you first`, acts:[['Approve','approveOutreach',r.id,'primary'],['View','openRole',r.id,'']]});
+  });
+  S.apps.filter(a => ids.has(a.roleId)).forEach(a => {
+    const r = R(a.roleId), p = P(a.pid);
+    if (a.pending && a.pending !== 'outreach') items.push({r, tone:'agent', text:`Approve: ${KIND_LABEL[a.pending]} for ${p.name}`, sub:r.title, acts:[['Approve','approvePending',a.id,'primary'],['View','openApp',a.id,'']]});
+    if (a.status === 'screening' && a.step === 'decide') items.push({r, tone:'warn', text:`${p.name} is ${a.tags.filter(t => /budget|notice|Location/.test(t)).join(', ').toLowerCase()}. Include?`, sub:`${r.title} · expects ${lpa(a.screen.exp)} (max ${lpa(r.max)}) · notice ${a.screen.notice} days (max ${r.maxNotice})`, acts:[['Include','decide',a.id + '|1','primary'],['Close','decide',a.id + '|0',''],['View','openApp',a.id,'']]});
+    if (a.status === 'offer' && a.step === 'draft') items.push({r, tone:'company', text: a.offer && a.offer.comment ? `Revise ${p.name}'s offer` : `Draft an offer for ${p.name}`, sub: a.offer && a.offer.comment ? a.offer.comment : `${r.title} · cleared all rounds`, acts:[[a.offer ? 'Revise offer' : 'Draft offer','offerModal',a.id,'primary'],['View','openApp',a.id,'']]});
+    if (a.status === 'offer' && a.step === 'admin' && admin) items.push({r, tone:'warn', approval:true, text: admin ? `Approve above-budget offer: ${p.name}, ${lpa(a.offer.ctc)}` : `${p.name}'s offer is with the Head of Talent`, sub:`${r.title} · budget max ${lpa(r.max)}${a.offer.note ? ' · ' + a.offer.note : ''}`, acts: admin ? [['Approve','adminOffer',a.id + '|1','primary'],['Send back','adminOffer',a.id + '|0',''],['View','openApp',a.id,'']] : [['View','openApp',a.id,'']]});
+    if (a.rem === 2 && ['shortlist_hm','interviewing','offer'].includes(a.status)) { const who = a.status === 'interviewing' && a.step === 'feedback' ? stageHM(a) : r.hm; items.push({r, tone:'bad', text:`${who} is 2 days late on ${p.name}`, sub:waitOn(a)[1], acts:[['Nudge again','nudge',a.id,'primary'],['View','openApp',a.id,'']]}); }
+    if (a.status === 'notice' && a.step === 'datechange') items.push({r, tone:'warn', text:`${p.name} wants to join on ${fds(a.newJoin)} instead of ${fds(a.joinDate)}`, sub:r.title, acts:[['Approve','approveDate',a.id + '|1','primary'],['Keep original','approveDate',a.id + '|0','']]});
+    if (a.status === 'notice' && a.step !== 'datechange' && S.day >= a.joinDate) items.push({r, tone:'good', text:`Did ${p.name} join today?`, sub:r.title, acts:[['Joined','markJoined',a.id,'primary'],['Did not join','didNotJoin',a.id,'']]});
+    if (a.status === 'closed' && a.suggestFlag && !S.hidden.includes('flag-' + a.id)) items.push({r, tone:'bad', text:`${p.name} missed two interviews. Hide from future shortlists?`, sub:r.title, acts:[['Flag','flagModal',a.pid + '|' + a.id,'danger'],['Dismiss','dismiss','flag-' + a.id,'']]});
+    if (a.status === 'closed' && /^Declined/.test(a.closed.reason) && !S.hidden.includes('dec-' + a.id) && r.status === 'Open') {
+      const next = S.apps.filter(x => x.roleId === r.id && ['offer','interviewing','shortlist_hm','ready'].includes(x.status)).sort((x, y) => P(y.pid).match - P(x.pid).match)[0];
+      items.push({r, tone:'warn', text:`${p.name} declined. ${r.seats - r.filled} seats still open.`, sub: next ? `Next best: ${P(next.pid).name}` : 'Nobody else is far along.', acts:[next ? ['View next best','openApp',next.id,'primary'] : ['Find candidates','findCandidates',r.id,'primary'],['Dismiss','dismiss','dec-' + a.id,'']]});
+    }
+  });
+  return items;
+}
+const toneColor = t => ({company:'var(--company)', agent:'var(--agent)', warn:'var(--warn)', bad:'var(--bad)', good:'var(--good)'})[t] || 'var(--muted)';
+const attnHTML = (items, empty) => items.length ? items.map(it => `<div class="item"><span class="dot" style="background:${toneColor(it.tone)}"></span><div class="body"><p>${esc(it.text)}${ownerTag(it.r)}</p>${it.sub ? `<p class="small muted">${esc(it.sub)}</p>` : ''}${it.acts.length ? `<div class="acts">${it.acts.map(x => btn(x[0], x[1], x[2], 'sm ' + (x[3] || ''))).join('')}</div>` : ''}</div></div>`).join('') : `<p class="empty">${empty || 'Nothing to do.'}</p>`;
+
+function funnel(r){
+  const apps = S.apps.filter(a => a.roleId === r.id);
+  const g = {early:0, mid:0, late:0, joined:0};
+  apps.forEach(a => { if (['sourced','contacted','screening'].includes(a.status)) g.early++; else if (['ready','shortlist_hm','interviewing'].includes(a.status)) g.mid++; else if (['offer','notice'].includes(a.status)) g.late++; else if (a.status === 'joined') g.joined++; });
+  const tot = Math.max(1, g.early + g.mid + g.late + g.joined);
+  return `<div class="bar" aria-hidden="true"><i style="width:${g.early / tot * 100}%;background:var(--agent);opacity:.55"></i><i style="width:${g.mid / tot * 100}%;background:var(--company)"></i><i style="width:${g.late / tot * 100}%;background:var(--warn)"></i><i style="width:${g.joined / tot * 100}%;background:var(--good)"></i></div>`;
+}
+const legend = `<div class="legend"><span><i style="background:var(--agent);opacity:.55"></i>Finding</span><span><i style="background:var(--company)"></i>Interviewing</span><span><i style="background:var(--warn)"></i>Offer & notice</span><span><i style="background:var(--good)"></i>Joined</span></div>`;
+function roleRisks(r){
+  if (r.status !== 'Open') return [];
+  const apps = S.apps.filter(a => a.roleId === r.id), out = [];
+  if (!apps.some(isActive)) out.push('No candidates in process');
+  const late = apps.filter(a => a.rem === 2).length; if (late) out.push(`${late} waiting on a hiring manager for 2+ days`);
+  const pend = apps.filter(a => a.pending).length; if (pend) out.push(`${pend} waiting for ${RN(r)}'s approval`);
+  const left = r.target - S.day; if (left < 60 && r.filled / r.seats < 0.5) out.push(`${r.seats - r.filled} of ${r.seats} seats open, ${left} days to target`);
+  return out;
+}
+function comingUp(apps){
+  const ev2 = [];
+  apps.forEach(a => {
+    const p = P(a.pid);
+    if (a.status === 'interviewing' && a.step === 'scheduled' && a.slot && a.slot.d >= S.day && a.slot.d <= S.day + 7) ev2.push({d:a.slot.d, k:'Interview', t:`${p.name} · ${stage(a).name}, ${a.slot.time}`, id:a.id});
+    if (a.status === 'interviewing' && a.step === 'takehome' && a.thDue <= S.day + 7) ev2.push({d:a.thDue, k:'Take-home due', t:`${p.name} · ${stage(a).name}`, id:a.id});
+    if (a.status === 'notice' && a.joinDate <= S.day + 30) ev2.push({d:a.joinDate, k:'Joins', t:`${p.name} · ${R(a.roleId).title}`, id:a.id});
+    if (a.status === 'offer' && a.step === 'sent') ev2.push({d:S.day, k:'Offer out', t:`${p.name} is deciding`, id:a.id});
+  });
+  return ev2.sort((x, y) => x.d - y.d).slice(0, 7);
+}
+function aiWeek(roleIds){
+  const ids = new Set(roleIds);
+  const ent = S.log.filter(l => l.actor === 'agent' && ids.has(l.roleId) && l.d > S.day - 7);
+  const c = {messages:0, scheduling:0, reminders:0, sourcing:0};
+  ent.forEach(l => { if (c[l.kind] !== undefined) c[l.kind]++; });
+  const tot = c.messages + c.scheduling + c.reminders + c.sourcing;
+  const hrs = Math.round(tot * 10 / 30) / 2;
+  return `<div class="aiweek"><div class="nums"><div><b>${c.messages}</b><span>Messages sent</span></div><div><b>${c.scheduling}</b><span>Interview bookings</span></div><div><b>${c.reminders}</b><span>Reminders and nudges</span></div><div><b>${c.sourcing}</b><span>Candidate searches</span></div></div><p class="saved">About <b>${hrs} hours</b> of recruiter time saved</p><p class="small muted">Estimate: 10 minutes per step.</p></div>`;
+}
+
+/* ============ Portal pages ============ */
+function stats(roles){
+  const ids = new Set(roles.map(r => r.id)); const apps = S.apps.filter(a => ids.has(a.roleId));
+  const open = roles.filter(r => r.status === 'Open').length, inProc = apps.filter(a => isActive(a) && a.status !== 'sourced').length, offers = apps.filter(a => a.status === 'offer').length;
+  const filled = roles.reduce((s, r) => s + r.filled, 0), seats = roles.filter(r => r.status !== 'Closed').reduce((s, r) => s + r.seats, 0);
+  const mine = isAdmin() ? 'at Acme' : 'in your roles';
+  const st = (v, n, label, tip) => `<button class="stat" data-a="stat" data-v="${v}" aria-label="${esc(label)}: ${n}. ${esc(tip)}"><b>${n}</b><span>${label}</span><span class="tip">${esc(tip)}</span></button>`;
+  return `<div class="stats">${st('roles', open, 'Open roles', `Roles actively hiring ${mine}. Paused, filled and closed roles aren't counted. Click to see them.`)}${st('inproc', inProc, 'Candidates in process', `People who replied and are in screening, interviews, offer or notice period ${mine}. Click to see who.`)}${st('offers', offers, 'Offers out', `Offers being drafted, approved or waiting on the candidate ${mine}. Not yet accepted. Click to see who.`)}${st('seats', `${filled} / ${seats}`, 'Seats filled', `People who have joined, out of all seats ${mine}. Click to see it role by role.`)}</div>`;
+}
+function viewHome(){
+  if (!RECS[ui.persona]) return viewOverview();
+  const roles = myRoles(), items = attention(ui.persona), up = comingUp(myApps());
+  return head('Home', `${RECS[ui.persona].name} · ${RECS[ui.persona].sub}`) + stats(roles) + `
+  <div class="cols"><div>
+    <section class="panel"><div class="panel-h"><h2>To do</h2><span class="small muted">${items.length}</span></div>${attnHTML(items, 'All clear. The AI and HireLoop are on it.')}</section>
+  </div><div>
+    <section class="panel"><div class="panel-h"><h2>Coming up</h2></div>${up.length ? up.map(e => `<div class="upc"><span class="when">${e.d === S.day ? 'Today' : fds(e.d)}</span><div><b>${esc(e.k)}</b> · ${esc(e.t)} ${btn('View','openApp',e.id,'link small')}</div></div>`).join('') : '<p class="empty">Nothing in the next week.</p>'}</section>
+    <section class="panel"><div class="panel-h"><h2>My roles</h2></div>${roles.filter(r => r.status !== 'Closed').map(r => `<button class="rolecard" data-a="openRole" data-v="${r.id}"><span class="line1"><b>${esc(r.title)}</b><span class="small muted">${r.filled} / ${r.seats} filled</span></span><span class="small muted" style="display:block">${r.status === 'Open' ? `Target ${fds(r.target)} · ${esc(r.hm)}` : r.status}${roleRisks(r).length ? ` · <span style="color:var(--bad)">at risk</span>` : ''}</span>${funnel(r)}</button>`).join('')}${legend}</section>
+  </div></div>`;
+}
+function viewOverview(){
+  const approvals = attention('admin').filter(i => i.approval);
+  const risky = S.roles.map(r => ({r, why:roleRisks(r)})).filter(x => x.why.length);
+  const recRow = k => { const rs = S.roles.filter(r => r.owner === k), ids = new Set(rs.map(r => r.id)), apps = S.apps.filter(a => ids.has(a.roleId)); const late = apps.filter(a => a.rem === 2).length; return `<tr><td><b>${RECS[k].name}</b><br><span class="small muted">${RECS[k].sub}</span></td><td>${rs.filter(r => r.status === 'Open').length}</td><td>${apps.filter(a => isActive(a) && a.status !== 'sourced').length}</td><td>${apps.filter(a => a.status === 'offer').length}</td><td>${rs.reduce((s, r) => s + r.filled, 0)} / ${rs.reduce((s, r) => s + r.seats, 0)}</td><td>${attention(k).length}</td><td>${late ? `<span style="color:var(--bad)">${late}</span>` : '0'}</td><td>${btn('Open their view','asPersona',k,'sm')}</td></tr>`; };
+  return head('Overview', 'All recruiters at a glance, roles at risk, and decisions only you can make.') + stats(S.roles) + `
+  <section class="panel tablewrap"><div class="panel-h"><h2>Recruiters</h2>${btn('Add recruiter','addRecModal','','sm primary')}</div><table><thead><tr><th>Recruiter</th><th>Open roles</th><th>In process</th><th>Offers out</th><th>Seats filled</th><th>Open to-dos</th><th>Late items</th><th></th></tr></thead><tbody>${Object.keys(RECS).map(recRow).join('')}</tbody></table></section>
+  <div class="cols"><div>
+    <section class="panel"><div class="panel-h"><h2>Needs your approval</h2><span class="small muted">${approvals.length}</span></div>${attnHTML(approvals, 'No approvals waiting.')}</section>
+    <section class="panel"><div class="panel-h"><h2>Roles at risk</h2><span class="small muted">${risky.length}</span></div>${risky.length ? risky.map(({r, why}) => `<div class="item"><span class="dot" style="background:var(--bad)"></span><div class="body"><p><b>${esc(r.title)}</b>${ownerTag(r)}</p><ul class="why small">${why.map(w => `<li>${esc(w)}</li>`).join('')}</ul><div class="acts">${btn('Open role','openRole',r.id,'sm')}</div></div></div>`).join('') : '<p class="empty">No roles at risk.</p>'}</section>
+  </div><div>
+    <section class="panel"><div class="panel-h"><h2>AI work this week</h2><span class="small muted">All recruiters</span></div>${aiWeek(S.roles.map(r => r.id))}</section>
+  </div></div>`;
+}
+function viewRoles(){
+  const roles = myRoles();
+  return head('Roles', isAdmin() ? 'Every role at Acme and who owns it.' : 'The roles you own.') + `<section class="panel tablewrap"><table><thead><tr><th>Role</th>${isAdmin() ? '<th>Recruiter</th>' : ''}<th>Hiring manager</th><th>Filled</th><th>In process</th><th>Target</th><th>Status</th></tr></thead><tbody>
+  ${roles.map(r => { const risk = roleRisks(r).length; return `<tr><td><button class="btn link" data-a="openRole" data-v="${r.id}">${esc(r.title)}</button></td>${isAdmin() ? `<td>${RN(r)}</td>` : ''}<td>${esc(r.hm)}</td><td>${r.filled} / ${r.seats}</td><td>${S.apps.filter(a => a.roleId === r.id && isActive(a)).length}</td><td>${fds(r.target)}</td><td><span class="tag ${r.status === 'Open' ? (risk ? 'bad' : 'good') : (r.status === 'On hold' ? 'warn' : '')}">${r.status === 'Open' && risk ? 'At risk' : r.status}</span></td></tr>`; }).join('')}
+  </tbody></table></section>`;
+}
+function columns(r){ return [['sourced','Found'],['contacted','Contacted'],['screening','Screening'],['shortlist','Shortlist'], ...r.playbook.map((s, i) => ['st' + i, s.name]), ['offer','Offer'],['notice','Notice period'],['joined','Joined']]; }
+function colKey(a){ return ({sourced:'sourced', contacted:'contacted', screening:'screening', ready:'shortlist', shortlist_hm:'shortlist', offer:'offer', notice:'notice', joined:'joined'})[a.status] || (a.status === 'interviewing' ? 'st' + a.stageIdx : null); }
+function viewRole(){
+  const r = R(ui.roleId); if (!r) return viewRoles();
+  const apps = S.apps.filter(a => a.roleId === r.id);
+  const ready = apps.filter(a => a.status === 'ready').length;
+  const closed = apps.filter(a => a.status === 'closed');
+  const tabs = [['pipeline','Pipeline'],['about','About this role'],['closed',`Closed (${closed.length})`]];
+  let body = '';
+  if (ui.roleTab === 'pipeline') {
+    body = `${r.skipped.length ? `<p class="small muted" style="margin-bottom:10px">Skipped (flagged): ${r.skipped.map(s => esc(s.name)).join(', ')}</p>` : ''}
+    ${apps.filter(isActive).length || apps.some(a => a.status === 'joined') ? `<div class="board">${columns(r).map(([k, label]) => { const list = apps.filter(a => colKey(a) === k); return `<div class="col"><h3><span>${esc(label)}</span><span>${list.length}</span></h3>${list.map(a => { const p = P(a.pid); return `<button class="card" data-a="openApp" data-v="${a.id}"><b>${esc(p.name)}</b><span class="small muted">${esc(p.headline)}</span>${a.tags.length ? `<span>${a.tags.map(tagHTML).join('')}</span>` : ''}${waitHTML(a)}</button>`; }).join('')}</div>`; }).join('')}</div>` : `<div class="panel"><p class="empty">No candidates yet. Click Find candidates.</p></div>`}`;
+  } else if (ui.roleTab === 'about') {
+    body = `<section class="panel"><div style="padding:14px 16px"><p><b>Who we need</b></p><p class="muted" style="margin-bottom:12px">${esc(r.req || '')}</p><p><b>From the call with the ${esc(r.hm)}</b></p><p class="muted">${r.intake ? esc(r.intake) : 'Call not done yet.'}</p></div></section><section class="panel"><div class="panel-h"><h2>Interview rounds</h2></div>${r.playbook.map((s, i) => `<div class="item"><span class="dot" style="background:var(--company)"></span><div class="body"><p><b>${i + 1}. ${esc(s.name)}</b></p><p class="small muted">${s.type === 'interview' ? `Interview with the ${esc(s.by)}` : `Take-home, reviewed by the ${esc(s.by)}`}</p></div></div>`).join('')}</section>`;
+  } else if (ui.roleTab === 'closed') {
+    body = closed.length ? `<section class="panel tablewrap"><table><thead><tr><th>Candidate</th><th>Reason</th><th>Date</th><th></th></tr></thead><tbody>${closed.map(a => { const p = P(a.pid); const canReopen = !/stop|Removed/.test(a.closed.reason) && !activeFlag(p) && r.status === 'Open'; return `<tr><td><button class="btn link" data-a="openApp" data-v="${a.id}">${esc(p.name)}</button></td><td>${esc(a.closed.reason)}${a.closed.detail ? `<br><span class="small muted">${esc(a.closed.detail)}</span>` : ''}${activeFlag(p) ? '<br><span class="tag bad">Flagged</span>' : ''}</td><td>${fds(a.closed.d)}</td><td>${canReopen ? btn('Reopen','reopen',a.id,'sm') : ''}</td></tr>`; }).join('')}</tbody></table></section>` : `<div class="panel"><p class="empty">Nobody closed yet.</p></div>`;
+  }
+  const risks = roleRisks(r);
+  return `<p class="small"><button class="btn link" data-a="nav" data-v="roles">All roles</button></p><div class="rolehead"><div><h1>${esc(r.title)}</h1><div class="facts"><div><span>Filled </span><b>${r.filled} / ${r.seats}</b></div><div><span>Budget </span><b>${lpa(r.min)}–${lpa(r.max)}</b></div><div><span>Hiring manager </span><b>${esc(r.hm)}</b></div><div><span>Target </span><b>${fds(r.target)}</b></div><div><span>Status </span><b>${r.status}</b></div><div><span>Recruiter </span>${isAdmin() ? `<select aria-label="Recruiter" data-sel="roleOwner" data-k="${r.id}" style="width:auto;padding:2px 6px">${Object.entries(RECS).map(([k, x]) => `<option value="${k}"${k === r.owner ? ' selected' : ''}>${esc(x.name)}</option>`).join('')}</select>` : `<b>${RN(r)}</b>`}</div></div>${risks.length ? `<p class="small" style="color:var(--bad)">At risk: ${esc(risks.join('; '))}</p>` : ''}</div>
+  <div class="acts">${r.status === 'Open' ? btn('Find candidates','findCandidates',r.id,'primary') : ''}${ready ? btn(`Send shortlist (${ready})`,'sendShortlist',r.id,'primary') : ''}${r.status === 'Open' ? btn('Pause','roleStatus',r.id + '|hold','') : ''}${r.status === 'On hold' ? btn('Reopen','roleStatus',r.id + '|open','primary') : ''}${['Open','On hold'].includes(r.status) ? btn('Close role','roleStatus',r.id + '|close','danger') : ''}</div></div>
+  <div class="tabs" role="tablist">${tabs.map(([k, l]) => `<button class="tab" role="tab" aria-selected="${ui.roleTab === k}" data-a="roleTab" data-v="${k}">${l}</button>`).join('')}</div>${body}`;
+}
+function personStatus(p, roleIds){
+  const apps = S.apps.filter(a => a.pid === p.id && (!roleIds || roleIds.has(a.roleId)));
+  const offer = apps.find(a => a.status === 'offer');
+  if (offer) return {k:'active', offer:true, t:`${R(offer.roleId).title}: ${waitOn(offer)[1]}`};
+  const act = apps.find(a => isActive(a) && a.status !== 'sourced'), joined = apps.find(a => a.status === 'joined'), closed = apps.filter(a => a.status === 'closed').at(-1);
+  if (act) return {k:'active', t:`${R(act.roleId).title}: ${waitOn(act)[1]}`};
+  if (joined) return {k:'joined', t:`Joined as ${R(joined.roleId).title}`};
+  if (closed) return {k:'closed', t:`${R(closed.roleId).title}: ${closed.closed.reason}`};
+  return {k:'new', t:'Not contacted yet'};
+}
+function viewCandidates(){
+  const mineOnly = ui.cmine && !isAdmin(), myIds = mineOnly ? new Set(myRoles().map(r => r.id)) : null;
+  const people = Object.values(S.people).filter(p => (!p.generic || S.apps.some(a => a.pid === p.id)) && (!mineOnly || S.apps.some(a => a.pid === p.id && myIds.has(a.roleId))));
+  const q = ui.q.trim().toLowerCase();
+  const rows = people.map(p => ({p, st:personStatus(p, myIds), last:Math.max(-999, ...S.apps.filter(a => a.pid === p.id && a.msgs.length).map(a => a.msgs.at(-1).d))}))
+    .filter(x => !q || (x.p.name + ' ' + (x.p.headline || '') + ' ' + x.p.loc).toLowerCase().includes(q))
+    .filter(x => ui.cf === 'all' || (ui.cf === 'pool' ? x.p.consent === true : (ui.cf === 'flag' ? !!activeFlag(x.p) : (ui.cf === 'offer' ? !!x.st.offer : x.st.k === ui.cf))))
+    .sort((x, y) => y.last - x.last);
+  const chips = [['all','All'],['active','In process'],['offer','Offer stage'],['new','Not contacted'],['pool','Talent pool'],['closed','Closed'],['joined','Joined'],['flag','Flagged']];
+  return head('Candidates', 'Everyone HireLoop has found for Acme. Search here before starting a new search.') + `
+  <div class="filters"><div><label for="cand-q">Search</label><input id="cand-q" data-q="1" placeholder="Name, company, city" value="${esc(ui.q)}"></div></div>
+  <div class="chips">${chips.map(([k, l]) => `<button class="fchip" data-a="cf" data-v="${k}" aria-pressed="${ui.cf === k}">${l}</button>`).join('')}${isAdmin() ? '' : `<span style="width:12px"></span><button class="fchip" data-a="cmine" aria-pressed="${!!ui.cmine}">Only my roles</button>`}</div>
+  <section class="panel tablewrap"><table><thead><tr><th>Name</th><th>Current role</th><th>Exp</th><th>City</th><th>Source</th><th>Contact by</th><th>Status at Acme</th><th>Last contact</th></tr></thead><tbody>
+  ${rows.length ? rows.map(({p, st, last}) => `<tr><td><button class="btn link" data-a="openPerson" data-v="${p.id}">${esc(p.name)}</button>${p.consent === true ? '<br><span class="tag good">Talent pool</span>' : ''}${activeFlag(p) ? '<br><span class="tag bad">Flagged</span>' : ''}</td><td>${esc(p.headline || '')}</td><td style="white-space:nowrap">${p.years} yrs</td><td>${esc(p.loc)}</td><td>${esc(p.src.join(', '))}</td><td>${p.channel === 'email' ? 'Email' : 'WhatsApp'}</td><td>${esc(st.t)}</td><td>${last > -999 ? fds(last) : '–'}</td></tr>`).join('') : '<tr><td colspan="8" class="muted">No one matches.</td></tr>'}
+  </tbody></table></section>`;
+}
+
+/* ============ Drawers & modals ============ */
+function appDrawer(){
+  const a = A(ui.drawer); if (!a) return '';
+  const p = P(a.pid), r = R(a.roleId), f = activeFlag(p);
+  const acts = [];
+  if (a.pending) acts.push(btn(`Approve: ${KIND_LABEL[a.pending]}`,'approvePending',a.id,'primary'));
+  if (a.status === 'screening' && a.step === 'decide') { acts.push(btn('Include anyway','decide',a.id + '|1','primary')); acts.push(btn('Close','decide',a.id + '|0')); }
+  if (a.status === 'ready') acts.push(btn('Send shortlist','sendShortlist',r.id,'primary'));
+  if (a.status === 'offer' && a.step === 'draft') acts.push(btn(a.offer ? 'Revise offer' : 'Draft offer','offerModal',a.id,'primary'));
+  if (a.status === 'offer' && a.step === 'admin') { acts.push(btn('Approve above budget','adminOffer',a.id + '|1','primary',!isAdmin())); acts.push(btn('Send back','adminOffer',a.id + '|0','',!isAdmin())); }
+  if (a.status === 'notice' && a.step === 'datechange') { acts.push(btn(`Approve ${fds(a.newJoin)}`,'approveDate',a.id + '|1','primary')); acts.push(btn('Keep original','approveDate',a.id + '|0')); }
+  if (a.status === 'notice' && a.step !== 'datechange' && S.day >= a.joinDate) { acts.push(btn('Joined','markJoined',a.id,'primary')); acts.push(btn('Did not join','didNotJoin',a.id)); }
+  if (a.rem === 2) acts.push(btn('Nudge again','nudge',a.id));
+  if (a.status === 'closed' && !/stop|Removed/.test(a.closed.reason) && !f && r.status === 'Open') acts.push(btn('Reopen','reopen',a.id));
+  if (!f) acts.push(btn('Flag','flagModal',a.pid + '|' + a.id,'danger'));
+  const demo = [];
+  if (a.status === 'interviewing' && a.step === 'scheduled') { demo.push(btn('Interview happened','demoHappened',a.id,'sm')); demo.push(btn('Mark no-show','demoNoShow',a.id,'sm')); }
+  if (a.msgs.length) demo.push(btn("Candidate's view",'goPhone',a.id,'sm'));
+  if (waitOn(a)[0] === 'hm') demo.push(btn("Hiring manager's Slack",'goSlack',a.id,'sm'));
+  return `<button class="scrim" data-a="closeDrawer" aria-label="Close"></button><aside class="drawer" role="dialog" aria-label="${esc(p.name)}">
+  ${btn('Close','closeDrawer','','sm xclose')}
+  <h1 style="font-size:22px">${esc(p.name)}</h1><p class="muted">${esc(p.headline)} · ${p.years} yrs · ${esc(p.loc)}</p>
+  <p class="small muted">${esc(r.title)} · match ${p.match}% · ${esc(p.src.join(', '))} · contact by ${chan(a)}</p>
+  <div style="margin-top:8px">${a.tags.map(tagHTML).join('')}${f ? '<span class="tag bad">Flagged</span>' : ''}</div>
+  ${waitHTML(a)}
+  ${acts.length ? `<div class="acts" style="margin-top:14px">${acts.join('')}</div>` : ''}
+  ${f ? `<div class="sec fb" style="border-color:var(--bad)"><b style="color:var(--bad)">Flagged: ${esc(f.reason)}</b><p class="small">${esc(f.note)}</p><p class="small muted">${esc(f.by)}, ${fds(f.d)} · review ${fds(f.review)}</p>${isAdmin() ? `<div class="acts">${btn('Remove flag','removeFlag',p.id,'sm danger')}</div>` : ''}</div>` : ''}
+  <div class="sec"><h3>Why they fit</h3><ul class="why">${p.why.map(w => `<li>${esc(w)}</li>`).join('')}</ul></div>
+  ${a.screen ? `<div class="sec"><h3>Screening</h3><p class="small">Notice ${a.screen.notice} days · expects ${lpa(a.screen.exp)} · location ${a.screen.loc === 'yes' ? 'okay' : 'not okay'}</p>${a.offer ? `<p class="small">Offer ${lpa(a.offer.ctc)} · joins ${fds(a.joinDate ?? a.offer.join)}</p>` : ''}</div>` : ''}
+  <div class="sec"><h3>Feedback at Acme</h3>${p.feedback.length ? p.feedback.slice().reverse().map(x => `<div class="fb"><p><b>${DEC[x.decision]}</b> · ${esc(x.stage)} · ${esc(x.roleTitle)}</p>${x.notes ? `<p class="small">${esc(x.notes)}</p>` : ''}<p class="small muted">${esc(x.by)}, ${fds(x.d)}</p></div>`).join('') : '<p class="small muted">None yet.</p>'}</div>
+  <div class="sec"><h3>Timeline</h3><ul class="tl">${a.tl.slice().reverse().map(t => `<li><i style="background:${ACT[t.actor].c}"></i><div>${actorTag(t.actor)} <span class="small muted">· ${fds(t.d)}</span><p class="small">${esc(t.text)}</p></div></li>`).join('')}</ul></div>
+  ${demo.length ? `<div class="sec"><h3>Demo shortcuts</h3><div class="acts">${demo.join('')}</div></div>` : ''}
+  </aside>`;
+}
+function personDrawer(){
+  const p = P(ui.pdrawer); if (!p) return '';
+  const apps = S.apps.filter(a => a.pid === p.id), f = activeFlag(p);
+  return `<button class="scrim" data-a="closeDrawer" aria-label="Close"></button><aside class="drawer" role="dialog" aria-label="${esc(p.name)}">
+  ${btn('Close','closeDrawer','','sm xclose')}
+  <h1 style="font-size:22px">${esc(p.name)}</h1><p class="muted">${esc(p.headline || '')} · ${p.years} yrs · ${esc(p.loc)}</p>
+  <p class="small muted">${esc(p.src.join(', '))} · contact by ${p.channel === 'email' ? 'email' : 'WhatsApp'}${p.consent === true ? ' · in talent pool' : (p.consent === false ? ' · no future contact' : '')}</p>
+  ${f ? `<div class="sec fb" style="border-color:var(--bad)"><b style="color:var(--bad)">Flagged: ${esc(f.reason)}</b><p class="small">${esc(f.note)}</p><p class="small muted">${esc(f.by)}, ${fds(f.d)}</p>${isAdmin() ? `<div class="acts">${btn('Remove flag','removeFlag',p.id,'sm danger')}</div>` : ''}</div>` : ''}
+  <div class="sec"><h3>Applications at Acme</h3>${apps.length ? apps.map(a => `<div class="fb"><p><b>${esc(R(a.roleId).title)}</b></p>${waitHTML(a)}<div class="acts">${btn('Open','openApp',a.id,'sm')}</div></div>`).join('') : `<p class="small muted">Not contacted for any Acme role yet. Use Find candidates on a role to reach out.</p>`}</div>
+  <div class="sec"><h3>Why they could fit</h3><ul class="why">${p.why.map(w => `<li>${esc(w)}</li>`).join('')}</ul></div>
+  <div class="sec"><h3>Feedback at Acme</h3>${p.feedback.length ? p.feedback.slice().reverse().map(x => `<div class="fb"><p><b>${DEC[x.decision]}</b> · ${esc(x.stage)} · ${esc(x.roleTitle)}</p>${x.notes ? `<p class="small">${esc(x.notes)}</p>` : ''}<p class="small muted">${esc(x.by)}, ${fds(x.d)}</p></div>`).join('') : '<p class="small muted">None.</p>'}</div>
+  ${!f ? `<div class="acts" style="margin-top:16px">${btn('Flag','flagModal',p.id + '|','danger sm')}</div>` : ''}
+  </aside>`;
+}
+function modalHTML(){
+  const m = ui.modal; if (!m) return '';
+  let inner = '';
+  if (m.type === 'offer') {
+    const a = A(m.appId), r = R(a.roleId), p = P(a.pid);
+    const def = a.offer ? a.offer.ctc : Math.min(a.screen ? a.screen.exp : r.max, r.max);
+    const notice = a.screen ? a.screen.notice : 60;
+    inner = `<h2>Offer for ${esc(p.name)}</h2><p class="small muted">Budget ${lpa(r.min)}–${lpa(r.max)} · expects ${a.screen ? lpa(a.screen.exp) : '?'} · notice ${notice} days</p>
+    ${a.offer && a.offer.comment ? `<p class="small" style="color:var(--warn);margin-top:8px">${esc(a.offer.comment)}</p>` : ''}
+    <div class="row"><div><label for="of-ctc">CTC (₹ LPA)</label><input id="of-ctc" type="number" min="1" value="${def}"><p class="hint">Above ${lpa(r.max)} needs the Head of Talent.</p></div>
+    <div><label for="of-days">Joins in</label><select id="of-days">${[15,30,45,60,75,90,120].map(d => `<option value="${d}"${d === notice ? ' selected' : ''}>${d} days (${fds(S.day + d)})</option>`).join('')}</select></div></div>
+    <label for="of-note">Note for the approver (optional)</label><textarea id="of-note"></textarea>
+    <div class="acts" style="margin-top:16px">${btn('Send for approval','submitOffer',a.id,'primary')}${btn('Cancel','closeModal','')}</div>`;
+  } else if (m.type === 'flag') {
+    const p = P(m.pid);
+    inner = `<h2>Flag ${esc(p.name)}</h2><p class="small muted">They won't appear in Acme's future shortlists. Only the Head of Talent can remove a flag.</p>
+    <label for="fl-reason">Reason</label><select id="fl-reason">${FLAG_REASONS.map(x => `<option>${esc(x)}</option>`).join('')}</select>
+    <label for="fl-note">What happened</label><textarea id="fl-note"></textarea>
+    <div class="acts" style="margin-top:16px">${btn('Flag','submitFlag',m.pid + '|' + (m.appId || ''),'danger')}${btn('Cancel','closeModal','')}</div>`;
+  } else if (m.type === 'addrec') {
+    const n = Object.keys(RECS).length + 1;
+    inner = `<h2>Add a recruiter</h2><p class="small muted">They get their own view. Give them roles from New role, or move an existing role to them from the role page.</p>
+    <label for="nr-name">Name</label><input id="nr-name" value="Recruiter ${n}">
+    <label for="nr-sub">What they'll hire for</label><input id="nr-sub" value="Sales & finance roles">
+    <div class="acts" style="margin-top:16px">${btn('Add recruiter','addRec','','primary')}${btn('Cancel','closeModal','')}</div>`;
+  } else if (m.type === 'wizard') inner = wizardHTML();
+  return `<button class="scrim" data-a="closeModal" aria-label="Close"></button><div class="modal" role="dialog" aria-modal="true">${inner}</div>`;
+}
+function wizardHTML(){
+  const w = ui.wiz, d = w.d, names = ['Basics','Who you need','Interview plan','Review'];
+  const hmOpts = sel => Object.keys(HMS).map(n => `<option${n === sel ? ' selected' : ''}>${n}</option>`).join('');
+  let body = '';
+  if (w.step === 1) body = `<label for="w-title">Role</label><input id="w-title" data-w="title" value="${esc(d.title)}">
+    ${isAdmin() ? `<label for="w-owner">Recruiter</label><select id="w-owner" data-w="owner">${Object.entries(RECS).map(([k, x]) => `<option value="${k}"${k === d.owner ? ' selected' : ''}>${x.name} (${x.sub})</option>`).join('')}</select>` : ''}
+    <div class="row3"><div><label for="w-seats">Seats</label><input id="w-seats" type="number" min="1" data-w="seats" value="${d.seats}"></div><div><label for="w-min">Min (₹ LPA)</label><input id="w-min" type="number" data-w="min" value="${d.min}"></div><div><label for="w-max">Max (₹ LPA)</label><input id="w-max" type="number" data-w="max" value="${d.max}"></div></div>
+    <div class="row3"><div><label for="w-notice">Max notice</label><select id="w-notice" data-w="maxNotice">${[30,60,90].map(x => `<option value="${x}"${x == d.maxNotice ? ' selected' : ''}>${x} days</option>`).join('')}</select></div><div><label for="w-loc">Location</label><input id="w-loc" data-w="location" value="${esc(d.location)}"></div><div><label for="w-target">Fill within</label><select id="w-target" data-w="targetDays">${[60,90,120,150,180].map(x => `<option value="${x}"${x == d.targetDays ? ' selected' : ''}>${x} days</option>`).join('')}</select></div></div>
+    <label for="w-hm">Hiring manager</label><select id="w-hm" data-w="hm">${hmOpts(d.hm)}</select><p class="hint">Gets shortlists, interview briefs and offer approvals on Slack.</p>`;
+  if (w.step === 2) body = `<label for="w-req">Who do you need?</label><textarea id="w-req" data-w="req" style="min-height:140px">${esc(d.req)}</textarea><p class="hint">Paste a job description or type keywords. The AI turns this into a search.</p>`;
+  if (w.step === 3) body = `<label for="w-tpl">Start from a template</label><select id="w-tpl" data-w="tpl" data-rr="1">${Object.entries(TEMPLATES).map(([k, t]) => `<option value="${k}"${k === d.tpl ? ' selected' : ''}>${t.label} (${t.stages.length} round${t.stages.length > 1 ? 's' : ''})</option>`).join('')}</select>
+    <label>Rounds, in order</label>${d.stages.map((s, i) => `<div class="stagerow"><input aria-label="Round ${i + 1} name" data-w="stages.${i}.name" value="${esc(s.name)}"><select aria-label="Round ${i + 1} type" data-w="stages.${i}.type"><option value="interview"${s.type === 'interview' ? ' selected' : ''}>Interview</option><option value="takehome"${s.type === 'takehome' ? ' selected' : ''}>Take-home</option></select><select aria-label="Round ${i + 1} interviewer" data-w="stages.${i}.by">${hmOpts(s.by)}</select><span class="ctl">${btn('↑','wzSt','up|' + i,'sm',i === 0)}${btn('↓','wzSt','down|' + i,'sm',i === d.stages.length - 1)}${btn('✕','wzSt','del|' + i,'sm')}</span></div>`).join('')}
+    ${btn('Add round','wzSt','add|0','sm')}
+    <label style="margin-top:18px">What the AI does alone for this role</label>
+    ${[['outreach','First messages'],['booking','Booking interviews'],['takehome','Sending take-homes']].map(([k, l]) => `<div class="lvl"><span>${l}</span><select aria-label="${l}" data-w="auto.${k}"><option value="auto"${d.auto[k] === 'auto' ? ' selected' : ''}>On its own</option><option value="approve"${d.auto[k] === 'approve' ? ' selected' : ''}>Ask me first</option></select></div>`).join('')}`;
+  if (w.step === 4) body = `<div class="fb"><p><b>${esc(d.title)}</b> · ${d.seats} seats · ${lpa(d.min)}–${lpa(d.max)}</p><p class="small muted">${esc(d.location)} · max notice ${d.maxNotice} days · hiring manager: ${esc(d.hm)} · ${RECS[d.owner].name}</p></div>
+    <div class="fb"><p class="small">${d.stages.map((s, i) => `${i + 1}. ${esc(s.name)} (${s.type === 'interview' ? esc(s.by) : 'take-home'})`).join('<br>')}</p></div>`;
+  return `<h2>New role</h2><div class="steps">${names.map((n, i) => `<span class="${i + 1 === w.step ? 'on' : ''}">${i + 1}. ${n}</span>`).join('')}</div>${body}
+  <div class="acts" style="margin-top:18px;justify-content:space-between"><span>${w.step > 1 ? btn('Back','wzBack','') : btn('Cancel','closeModal','')}</span><span>${w.step < 4 ? btn('Next','wzNext','','primary') : btn('Create role','wzLaunch','','primary')}</span></div>`;
+}
+
+function viewPortal(){
+  const nav = (isAdmin() ? [['home','Overview']] : [['home','Home']]).concat([['roles','Roles'],['candidates','Candidates']]);
+  const cur = ui.view === 'role' ? 'roles' : ui.view;
+  let main;
+  switch (ui.view) { case 'roles': main = viewRoles(); break; case 'role': main = viewRole(); break; case 'candidates': main = viewCandidates(); break; default: main = isAdmin() ? viewOverview() : viewHome(); }
+  return `<nav class="pnav" aria-label="Acme">${nav.map(([k, l]) => `<button class="tab" data-a="nav" data-v="${k}" ${cur === k ? 'aria-current="page"' : ''}>${l}</button>`).join('')}<span class="spacer"></span>${btn('New role','newRole','','primary sm')}</nav><main>${main}</main>`;
+}
+
+/* ============ Slack ============ */
+function slackHTML(){
+  const items = S.inbox.filter(m => m.hm === ui.hm && !m.cancelled).sort((x, y) => x.d - y.d);
+  const open = items.filter(m => !m.done);
+  const nOpen = n => S.inbox.filter(m => m.hm === n && !m.done && !m.cancelled).length;
+  const aiBox = (a, label, lines) => `<div class="sblock ai"><div class="ailbl">${label}</div><ul>${lines.map(([k, v]) => `<li><b>${esc(k)}:</b> ${esc(v)}</li>`).join('')}</ul></div>`;
+  const msg = (m, title, body) => { const pill = m.type === 'brief' ? '<span class="pill">FYI</span>' : (m.done ? '<span class="pill done">Done</span>' : '<span class="pill act">Needs your reply</span>'); return `<div class="smsg ${ui.focus === m.id ? 'focus' : ''}" id="msg-${m.id}"><span class="av">HL</span><div><span class="nm">HireLoop</span><span class="app">APP</span><span class="tm">${fds(m.d)}</span><p style="margin-top:2px">${pill}<b>${esc(title)}</b></p>${body}</div></div>`; };
+  const label = m => { if (m.type === 'shortlist') return `Shortlist: ${R(m.roleId).title}`; const p = P(A(m.appId).pid); return {scorecard:`Feedback: ${p.name}`, offer:`Approve offer: ${p.name}`, reminder:`Reminder: ${p.name}`}[m.type] || p.name; };
+  const feed = items.map(m => {
+    const r = R(m.roleId);
+    if (m.type === 'shortlist') return msg(m, `Interview these candidates for ${r.title}?`, `<p class="small muted">Screened by HireLoop. Tap yes and the AI books the interview with you.</p>${m.appIds.map(id => { const a = A(id), p = P(a.pid), dec = m.decided[id]; return `<div class="sblock ai"><p><b>${esc(p.name)}</b> · ${esc(p.headline)}</p><ul><li><b>Why shortlisted:</b> ${esc(p.why.slice(0, 2).join('; '))}</li><li><b>Notice and pay:</b> ${a.screen ? `${a.screen.notice} days, expects ${lpa(a.screen.exp)} (budget up to ${lpa(r.max)})` : 'not screened'}</li>${p.feedback.length && !p.feedback.some(f => f.roleId === r.id) ? `<li style="color:var(--warn)"><b>Past feedback:</b> ${p.feedback.map(f => `${DEC[f.decision]} for ${esc(f.roleTitle)} (${esc(f.notes)})`).join('; ')}</li>` : ''}</ul>${dec ? `<p class="sdone">You said ${dec === 'yes' ? 'yes' : 'no'}</p>` : (isActive(a) ? `<div class="sbtns">${sbtn('Yes, interview','hmShort',`${m.id}|${id}|1`,'go')}${sbtn('No, pass','hmShort',`${m.id}|${id}|0`,'')}</div>` : '<p class="sdone">No longer active</p>')}</div>`; }).join('')}`);
+    if (m.type === 'brief') { const a = A(m.appId), p = P(a.pid); return msg(m, `Interview booked: ${p.name}, ${fd(m.slot.d)} at ${m.slot.time}`, `<p class="small muted">${esc(m.stage)} · ${esc(r.title)} · it's on your calendar</p>${aiBox(a, 'AI brief: what to know before you go in', aiLines(a))}`); }
+    if (m.type === 'scorecard') {
+      const a = A(m.appId), p = P(a.pid), dec = ui.dec[m.id];
+      const when = m.kind === 'takehome' ? `${p.name} submitted the ${m.stage.toLowerCase()}: docs.example.com/my-assignment` : `You interviewed ${p.name} on ${fd(m.when ? m.when.d : m.d)}${m.when ? ` at ${m.when.time}` : ''} (${m.stage.toLowerCase()}).`;
+      let body = `<p class="small muted">${esc(when)}</p>${aiBox(a, 'AI recap, to jog your memory', aiLines(a))}`;
+      if (m.done) body += `<p class="sdone">You said: ${esc(m.result)}</p>`;
+      else {
+        body += `<p class="small" style="margin-top:8px">How did they do? Your answer is saved on their record for future roles.</p><div class="sbtns">${Object.entries(DEC).map(([k, l]) => sbtn(l,'hmPick',`${m.id}|${k}`, k === 'strong_no' || k === 'no' ? 'no' : '', dec === k)).join('')}</div>`;
+        if (dec) body += `<div style="max-width:520px"><label for="sc-notes-${m.id}">Note (optional)</label><textarea id="sc-notes-${m.id}"></textarea>${dec === 'strong_no' ? `<div class="fb" style="margin-top:8px"><label style="margin:0;display:flex;align-items:center"><input type="checkbox" id="sc-flag-${m.id}">Don't show this person to Acme again</label><select id="sc-reason-${m.id}" style="margin-top:8px">${FLAG_REASONS.map(x => `<option>${esc(x)}</option>`).join('')}</select></div>` : ''}<div class="sbtns">${sbtn('Submit','hmScore',m.id,'go')}</div></div>`;
+      }
+      return msg(m, m.kind === 'takehome' ? `Review ${p.name}'s take-home` : `How did ${p.name} do?`, body);
+    }
+    if (m.type === 'offer') {
+      const a = A(m.appId), p = P(a.pid), rounds = p.feedback.filter(f => f.roleId === r.id);
+      let body = `<div class="sblock"><ul><li><b>Role:</b> ${esc(r.title)}</li><li><b>Offer:</b> ${lpa(a.offer.ctc)} (budget ${lpa(r.min)}–${lpa(r.max)})</li><li><b>Joins:</b> ${fd(a.offer.join)}</li>${rounds.length ? `<li><b>Rounds:</b> ${rounds.map(f => `${esc(f.stage)} ${DEC[f.decision].toLowerCase()}`).join(' · ')}</li>` : ''}${a.offer.note ? `<li><b>Recruiter's note:</b> ${esc(a.offer.note)}</li>` : ''}</ul></div>`;
+      if (m.done) body += `<p class="sdone">${esc(m.result)}</p>`;
+      else body += `<div class="sbtns">${sbtn('Approve offer','hmOffer',m.id + '|1','go')}${sbtn('Request a change','hmChange',m.id,'')}</div>${ui.chg[m.id] ? `<div style="max-width:520px"><label for="of-change-${m.id}">What should change?</label><textarea id="of-change-${m.id}"></textarea><div class="sbtns">${sbtn('Send','hmOffer',m.id + '|0','go')}</div></div>` : ''}`;
+      return msg(m, `Approve offer for ${p.name}?`, body);
+    }
+    const a = A(m.appId), p = P(a.pid);
+    return msg(m, `Reminder: ${p.name} is waiting on your ${m.about}`, m.done ? '' : `<div class="sbtns">${sbtn('Take me there','openReminder',m.id,'go')}</div>`);
+  }).join('');
+  const pin = open.length ? `<div class="pin"><b>${open.length} need${open.length === 1 ? 's' : ''} your reply</b><div class="sbtns">${open.map(m => sbtn(label(m),'slackFocus',m.id,'')).join('')}</div></div>` : `<div class="pin"><b>You're all caught up.</b></div>`;
+  return `<div class="slack"><nav class="sside"><div class="ws">Acme</div><div class="me"><label for="hm-as" style="color:var(--slack-muted);margin:0 0 4px;font-weight:600;font-size:12px">Signed in as</label><select id="hm-as" data-sel="hmAs">${Object.keys(HMS).map(n => `<option value="${n}"${n === ui.hm ? ' selected' : ''}>${n}${nOpen(n) ? ` (${nOpen(n)})` : ''}</option>`).join('')}</select></div>
+    <h4>Channels</h4><button class="ch">#general</button><button class="ch">#${HMS[ui.hm]}</button>
+    <h4>Apps</h4><button class="ch" aria-current="true"><span>HireLoop</span>${nOpen(ui.hm) ? `<span class="badge">${nOpen(ui.hm)}</span>` : ''}</button></nav>
+    <div class="smain"><div class="shead"><div><b>HireLoop</b><p class="small muted">What hiring managers see. No new tool: interview briefs, feedback and offer approvals arrive in Slack, one tap each.</p></div></div><div style="padding:0 20px">${pin}</div><div class="sfeed">${feed || '<p class="empty">No messages yet.</p>'}</div></div></div>`;
+}
+
+/* ============ Candidate ============ */
+function candOpts(a){
+  if (a.held) return {note:'Acme has paused this role.'};
+  if (a.status === 'closed') {
+    if (a.declineAsk) return {chips:[['Took another offer','c_reason','another'],['Pay','c_reason','comp'],['Role fit','c_reason','fit']]};
+    if (a.consentAsk) return {chips:[['Yes, keep me in mind','c_consent','1'],['No, thanks','c_consent','0']]};
+    return {note:'Conversation ended.'};
+  }
+  if (ui.ask === a.id) return {chips:[['Is it hybrid?','c_q','mode'],['Salary range?','c_q','salary'],['Relocation support?','c_q','reloc'],['Back','c_askclose','']]};
+  switch (a.status) {
+    case 'sourced': return {note:'Not contacted yet.'};
+    case 'contacted': return {chips:[['Yes, interested','c_yes'],['Not interested','c_no'],['Ask a question','c_ask'],['Stop messages','c_stop']]};
+    case 'screening': return a.step === 'questions' ? {form:'screen'} : {chips:[['Ask a question','c_ask']]};
+    case 'ready': case 'shortlist_hm': return {chips:[['Ask a question','c_ask']]};
+    case 'interviewing':
+      if (a.pending) return {note:'Waiting on Acme.'};
+      if (a.step === 'scheduling' && a.slots.length) return {chips:a.slots.map((s, i) => [`${fd(s.d)}, ${s.time}`,'c_slot',String(i)]).concat([['None of these work','c_noslot']])};
+      if (a.step === 'scheduled') return {chips:[['Can we reschedule?','c_resched'],['Ask a question','c_ask']]};
+      if (a.step === 'takehome') return {chips:[['Got it, thanks','c_thgot'],['Need more time','c_thmore'],['Submit assignment','c_thsub']]};
+      if (a.step === 'resched_help') return {note:'A recruiter will call you.'};
+      return {chips:[['Ask a question','c_ask']]};
+    case 'offer':
+      if (a.step === 'sent') return {chips:[['Accept offer','c_accept'],['Decline','c_decline'],['I have another offer','c_counter'],['Talk to a person','c_person']]};
+      if (a.step === 'negotiation') return {note:'A recruiter will call you.'};
+      return {chips:[['Ask a question','c_ask']]};
+    case 'notice':
+      if (a.step === 'datechange') return {note:'Waiting for Acme to confirm.'};
+      return {chips:[['All good, see you soon','c_ngood'],["I'm rethinking this",'c_nre'],['Move my joining date?','c_ndate']]};
+    case 'joined': return {note:'Welcome to Acme!'};
+  }
+  return {note:''};
+}
+const needsReply = a => { const o = candOpts(a); return !!(o.form || (o.chips && o.chips.some(c => c[1] !== 'c_ask' && c[1] !== 'c_askclose'))); };
+function screenForm(a){
+  const s = P(a.pid).scr, r = R(a.roleId);
+  return `<div class="qform"><div class="row"><div><label for="sc-notice">Notice period</label><select id="sc-notice">${[15,30,45,60,90,120].map(x => `<option value="${x}"${x === s.notice ? ' selected' : ''}>${x} days</option>`).join('')}</select></div><div><label for="sc-exp">Expected (₹ LPA)</label><input id="sc-exp" type="number" value="${s.exp}"></div></div><div class="row"><div><label for="sc-loc">Okay with ${esc(r.location)}?</label><select id="sc-loc"><option value="yes">Yes</option><option value="no">No</option></select></div><div><label for="sc-why">Why looking?</label><select id="sc-why"><option>Bigger scope</option><option>Growth has slowed</option><option>Relocating</option></select></div></div><div class="acts">${btn('Send answers','c_screen',a.id,'primary sm')}</div></div>`;
+}
+const chipsHTML = (a, o, solidFirst) => (o.chips || []).map((c, i) => `<button class="chip ${solidFirst && i === 0 ? 'solid' : ''}" data-a="${c[1]}" data-v="${a.id}|${esc(c[2] ?? '')}">${esc(c[0])}</button>`).join('');
+function prepTips(a){
+  const r = R(a.roleId);
+  if (/engineer/i.test(r.title)) return ['Be ready to walk through a system you built','Expect a debugging scenario','Ask about the on-call setup'];
+  if (/design/i.test(r.title)) return ['Bring 2 projects you are proud of','Explain one decision research changed','Keep each project to 10 minutes'];
+  return ['Pick one metric you moved and how','Think through a trade-off you made','Prepare 2 questions about Acme'];
+}
+function tracker(a){
+  const r = R(a.roleId), p = P(a.pid), st = a.status === 'interviewing' ? stage(a) : null;
+  const order = ['Screening','Shortlist','Interviews','Offer','Joining'];
+  const idx = s => ({sourced:0, contacted:0, screening:0, ready:1, shortlist_hm:1, interviewing:2, offer:3, notice:4, joined:5})[s] ?? 0;
+  const at = a.status === 'closed' ? idx(a.closed.prev) : idx(a.status);
+  const o = candOpts(a);
+  let next = '';
+  if (a.status === 'closed') next = `<div class="next" style="border-color:var(--line)"><h3>This application is closed</h3><p class="small muted">Thank you for your time.${p.consent ? " You're in HireLoop's talent pool." : ''}</p></div>`;
+  else if (a.held) next = `<div class="next"><h3>Paused</h3><p class="small">Acme has paused this role. We'll tell you when it reopens.</p></div>`;
+  else if (a.status === 'contacted') next = `<div class="next"><h3>Acme would like to talk to you</h3><p class="small">${esc(r.location)}, ${esc(r.mode)}</p><div class="acts">${chipsHTML(a, {chips:o.chips.filter(c => c[1] !== 'c_ask')}, true)}</div></div>`;
+  else if (a.status === 'screening' && a.step === 'questions') next = `<div class="next"><h3>Answer 4 quick questions</h3>${screenForm(a)}</div>`;
+  else if (['screening','ready','shortlist_hm'].includes(a.status)) next = `<div class="next"><h3>With the hiring team</h3><p class="small">You'll hear back within 2 working days.</p></div>`;
+  else if (a.status === 'interviewing') {
+    if (a.step === 'scheduling' && a.slots.length) next = `<div class="next"><h3>Pick a time: ${esc(st.name)}</h3><p class="small muted">With Acme's ${esc(st.by)} · video call · 45 min</p><div class="acts">${chipsHTML(a, o, false)}</div></div>`;
+    else if (a.step === 'scheduled') next = `<div class="next"><h3>${esc(st.name)}</h3><p class="small"><b>${fd(a.slot.d)}, ${a.slot.time}</b> · video call · with Acme's ${esc(st.by)}</p><p class="small" style="margin-top:8px"><b>How to prepare</b></p><ul>${prepTips(a).map(t => `<li>${esc(t)}</li>`).join('')}</ul><div class="acts">${btn('Reschedule','c_resched',a.id + '|','sm')}</div></div>`;
+    else if (a.step === 'takehome') next = `<div class="next"><h3>${esc(st.name)}</h3><p class="small">Propose a feature that cuts failed payments by 20%. One page, with the metrics you'd track.</p><p class="small" style="margin-top:6px"><b>Due ${fd(a.thDue)}</b></p><div class="acts">${btn('Submit','c_thsub',a.id + '|','primary sm')}${btn('Need more time','c_thmore',a.id + '|','sm')}</div></div>`;
+    else if (a.step === 'resched_help') next = `<div class="next"><h3>A recruiter will call you</h3><p class="small">To find an interview time that works.</p></div>`;
+    else next = `<div class="next"><h3>Waiting for feedback</h3><p class="small">On your ${esc(st.name.toLowerCase())}. Back to you within 2 working days.</p></div>`;
+  }
+  else if (a.status === 'offer') {
+    if (a.step === 'sent') next = `<div class="next"><h3>Your offer</h3><p class="small"><b>${lpa(a.offer.ctc)}</b> · joins ${fd(a.offer.join)}<br>${esc(r.location)}, ${esc(r.mode)}</p><div class="acts">${chipsHTML(a, o, true)}</div></div>`;
+    else if (a.step === 'negotiation') next = `<div class="next"><h3>A recruiter will call you</h3><p class="small">About your offer.</p></div>`;
+    else next = `<div class="next"><h3>Offer on its way</h3><p class="small">You cleared all rounds. Acme is preparing your offer.</p></div>`;
+  }
+  else if (a.status === 'notice') next = `<div class="next"><h3>You join on ${fd(a.joinDate)}</h3><p class="small" style="margin-top:4px"><b>Before you join</b></p><ul><li>Upload documents (PAN, Aadhaar, relieving letter)</li><li>Share your laptop delivery address</li><li>Optional: coffee call with your future team</li></ul>${a.step === 'datechange' ? '<p class="small muted" style="margin-top:6px">New date requested. Waiting for Acme.</p>' : `<div class="acts">${btn('Move my joining date','c_ndate',a.id + '|','sm')}</div>`}</div>`;
+  else if (a.status === 'joined') next = `<div class="next"><h3>Welcome to Acme!</h3></div>`;
+  return `<ol class="prog">${order.map((s, i) => `<li class="${i < at ? 'done' : (i === at && a.status !== 'closed' ? 'now' : '')}"><span class="mk">${i < at ? '✓' : ''}</span><span>${s}${s === 'Interviews' && a.status === 'interviewing' ? ` (${a.stageIdx + 1} of ${r.playbook.length})` : ''}</span></li>`).join('')}</ol>${next}`;
+}
+function myPage(p, curApp){
+  const apps = S.apps.filter(a => a.pid === p.id && a.msgs.length);
+  const sel = apps.find(a => a.id === ui.papp) || curApp || apps[0];
+  const stTxt = a => a.status === 'closed' ? 'Closed' : ({contacted:'New', screening:'Screening', ready:'With hiring team', shortlist_hm:'With hiring team', interviewing:'Interviewing', offer:'Offer', notice:'Joining soon', joined:'Joined'})[a.status] || '';
+  return `<div class="apage"><p class="co">HireLoop · your page</p><h2 style="font-size:18px">Hi ${esc(p.name.split(' ')[0])}</h2><p class="small muted" style="margin-bottom:12px">All your applications through HireLoop, in one place. We contact you by ${p.channel === 'email' ? 'email' : 'WhatsApp'}.</p>
+  ${apps.map(a => `<button class="appl" data-a="cApp" data-v="${a.id}" aria-current="${sel && sel.id === a.id}"><b>Acme · ${esc(R(a.roleId).title)}</b><br><span class="st">${stTxt(a)}</span></button>`).join('')}
+  ${(p.ext || []).map(x => `<div class="appl"><b>${esc(x.company)} · ${esc(x.role)}</b><br><span class="st">${esc(x.status)}</span></div>`).join('')}
+  ${sel ? `<h3 style="margin-top:14px">Acme · ${esc(R(sel.roleId).title)}</h3>${tracker(sel)}` : ''}</div>`;
+}
+function viewCandidate(){
+  const lastMsg = pid => Math.max(...S.apps.filter(a => a.pid === pid && a.msgs.length).map(a => a.msgs.at(-1).d * 1000 + a.msgs.length));
+  const people = [...new Set(S.apps.filter(a => a.msgs.length).map(a => a.pid))].sort((x, y) => lastMsg(y) - lastMsg(x));
+  if (!people.includes(ui.cand)) ui.cand = people[0] || null;
+  const p = ui.cand ? P(ui.cand) : null;
+  const threads = p ? S.apps.filter(a => a.pid === p.id && a.msgs.length) : [];
+  const thread = threads.find(a => a.id === ui.thread) || (threads.length === 1 ? threads[0] : null);
+  const isMail = p && p.channel === 'email';
+  const tabs = `<div class="phtabs" role="tablist"><button role="tab" aria-selected="${ui.ctab === 'msg'}" data-a="cTab" data-v="msg">${isMail ? 'Email' : 'WhatsApp'}</button><button role="tab" aria-selected="${ui.ctab === 'page'}" data-a="cTab" data-v="page">My HireLoop page</button></div>`;
+  let screen;
+  if (!p) screen = `<div class="chat"><p class="small muted">No one contacted yet.</p></div>`;
+  else if (ui.ctab === 'page') screen = tabs + myPage(p, thread);
+  else if (!thread) screen = tabs + `<div class="ph-h"><b>Pick a conversation</b></div><div class="chat" style="padding:0;gap:0">${threads.map(a => `<button class="thread" data-a="cThread" data-v="${a.id}"><b>Acme · ${esc(R(a.roleId).title)}</b><br><span class="small muted">${esc(a.msgs.at(-1).text.slice(0, 60))}…</span></button>`).join('')}</div>`;
+  else {
+    const o = candOpts(thread);
+    const quick = o.note ? `<span class="note">${esc(o.note)}</span>` : (o.form === 'screen' ? screenForm(thread) : chipsHTML(thread, o, false));
+    const r = R(thread.roleId);
+    if (isMail) {
+      const mails = thread.msgs.map(m => m.from === 'cand' ? `<div class="mail1 me"><div class="mh"><span>You replied</span><span>${fds(m.d)}</span></div><p>${esc(m.text)}</p></div>` : `<div class="mail1 ${m.from === 'team' ? 'team' : ''}"><div class="mh"><span>From: ${m.from === 'team' ? 'HireLoop recruiter' : 'HireLoop for Acme'} &lt;acme@hireloop.in&gt;</span><span>${fds(m.d)}</span></div><div class="ms">${esc(m.subj || `Re: ${r.title} role at Acme`)}</div><p>${esc(m.text)}</p></div>`).join('');
+      screen = tabs + `<div class="mailtop"><span>Inbox · ${esc(p.name.split(' ')[0].toLowerCase())}@mail.com</span><span>${threads.length > 1 ? btn('Other roles','cBack','','sm') : ''}</span></div><div class="mthread">${mails}</div><div class="quick"><span class="note" style="width:100%">One-click replies</span>${quick}</div>`;
+    } else {
+      let lastD = null;
+      const msgs = thread.msgs.map(m => { const sep = m.d !== lastD ? `<span class="daysep">${fd(m.d)}</span>` : ''; lastD = m.d; return sep + `<div class="bub ${m.from === 'cand' ? 'out' : 'in'} ${m.from === 'team' ? 'team' : ''}">${esc(m.text)}<span class="meta">${m.from === 'cand' ? 'You' : (m.from === 'team' ? 'HireLoop recruiter' : 'HireLoop assistant')}</span></div>`; }).join('');
+      screen = tabs + `<div class="ph-h">${threads.length > 1 ? btn('Back','cBack','','sm') : ''}<span class="av">HL</span><div><b style="font-size:14px">HireLoop for Acme</b><br><span class="small muted">${esc(r.title)}</span></div></div><div class="chat">${msgs}</div><div class="quick">${quick}</div>`;
+    }
+  }
+  const frame = isMail && ui.ctab === 'msg' ? 'mailbox' : 'phone';
+  return `<main style="padding-bottom:0">${head('Candidate view', 'What candidates see. No app, no login: messages arrive by email or WhatsApp, and one page shows every application.')}</main><div class="phonewrap" style="padding-top:0"><div class="plist" aria-label="Candidates"><h3>Choose a candidate</h3>${people.map(id => { const q = P(id); const needs = S.apps.some(x => x.pid === id && x.msgs.length && needsReply(x)); return `<button class="convo" data-a="cPick" data-v="${id}" aria-current="${ui.cand === id}"><span>${esc(q.name)}<span class="chan">${q.channel === 'email' ? 'Email' : 'WhatsApp'}</span></span>${needs ? '<span class="dot" style="background:var(--cand);margin-top:6px"></span>' : ''}</button>`; }).join('')}</div>
+  <div class="${frame}" aria-label="${p ? esc(p.name) : 'Candidate'}">${screen}</div></div>`;
+}
+
+/* ============ HireLoop recruiter ============ */
+const PRIO = {negotiation:[0,'Urgent','Within 1 hour'], risk:[0,'Urgent','Within 1 hour'], call:[1,'High','Today'], question:[1,'High','Today'], resched:[2,'Medium','Today'], th_missing:[2,'Medium','Today'], review:[2,'Medium','Today'], receipt:[3,'Normal','In 2 days'], intake:[3,'Normal','In 2 days']};
+const PCOL = ['var(--bad)','var(--warn)','var(--company)','var(--muted)'];
+const TYPE_LABEL = {intake:'Intake call', review:'Quality check', question:'Question', receipt:'Receipt call', th_missing:'Late take-home', resched:'Scheduling', negotiation:'Negotiation', risk:'Before joining', call:'Call request'};
+const tClient = t => t.client || 'Acme', tRole = t => t.roleTitle || (t.roleId ? R(t.roleId).title : '');
+function suggestion(t){
+  const r = t.roleId ? R(t.roleId) : null, a = t.appId ? A(t.appId) : null;
+  if (t.ext) return `Check ${t.client}'s notes before you reply. Log the outcome so ${t.client} sees it.`;
+  switch (t.type) {
+    case 'negotiation': return `Ask what the other offer is. Budget goes up to ${lpa(r.max)}; above that needs Acme's Head of Talent. Lead with the scope of the role and the team.`;
+    case 'risk': return 'Ask what changed. If it is a counter-offer, find the gap first, then loop in the recruiter at Acme.';
+    case 'question': return `Acme's notes don't cover this. Confirm with ${RN(r)} if unsure, then answer.`;
+    case 'call': return 'Ask what is on their mind. The AI could not help, so listen first.';
+    case 'review': return 'Remove wrong seniority and frequent job-hoppers. Candidates tagged "Past feedback" need a closer look.';
+    case 'intake': return `Ask the ${r.hm}: must-haves, deal-breakers, and what their best past hire had in common.`;
+    case 'receipt': return 'Confirm they got it and know the deadline. Answer doubts, but give no hints.';
+    case 'th_missing': return 'Ask if they are still interested. Offer 3 more days, once.';
+    case 'resched': return 'Find a slot on the phone and book it directly.';
+  }
+  return '';
+}
+function viewTeam(){
+  const f = ui.tf;
+  const all = S.tasks.filter(t => !t.done);
+  const list = all.filter(t => (f.who === 'All' || t.assignee === f.who) && (f.client === 'All' || tClient(t) === f.client) && (f.type === 'All' || t.type === f.type))
+    .sort((x, y) => f.sort === 'oldest' ? x.d - y.d : (f.sort === 'client' ? tClient(x).localeCompare(tClient(y)) || PRIO[x.type][0] - PRIO[y.type][0] : PRIO[x.type][0] - PRIO[y.type][0] || x.d - y.d));
+  const t = list.find(x => x.id === ui.task) || list[0] || null;
+  const urgent = all.filter(x => PRIO[x.type][0] === 0).length, today = all.filter(x => PRIO[x.type][2] !== 'In 2 days').length, doneToday = S.tasks.filter(x => x.done && x.doneD === S.day).length;
+  const sel = (k, label, opts) => `<div><label for="tf-${k}">${label}</label><select id="tf-${k}" data-sel="tf" data-k="${k}">${opts.map(([v, l]) => `<option value="${v}"${f[k] === v ? ' selected' : ''}>${l}</option>`).join('')}</select></div>`;
+  let detail = `<div class="panel"><p class="empty">No tasks match these filters.</p></div>`;
+  if (t) {
+    const a = t.appId ? A(t.appId) : null, r = t.roleId ? R(t.roleId) : null, pr = PRIO[t.type];
+    let work = '';
+    if (t.ext) work = `<label for="t-note">Outcome (optional)</label><textarea id="t-note"></textarea><div class="acts">${btn('Mark done','resolve',t.id + '|done','primary')}</div>`;
+    else if (t.type === 'intake') work = `<label for="t-note">Notes from the call</label><textarea id="t-note">Must-haves: payments or lending experience, crisp with numbers. Deal-breaker: pure growth background.</textarea><div class="acts">${btn('Save notes','resolve',t.id + '|done','primary')}</div>`;
+    else if (t.type === 'review') { const apps = S.apps.filter(x => x.roleId === r.id && x.status === 'sourced' && !x.reviewed); work = `${apps.map(x => { const p = P(x.pid); return `<div class="fb"><label style="margin:0;display:flex;align-items:center;font-weight:600"><input type="checkbox" id="keep-${x.id}" checked>${esc(p.name)} · ${p.match}% match</label><p class="small muted">${esc(p.headline)} · ${esc(p.src.join(', '))}</p><div>${x.tags.map(tagHTML).join('')}</div>${p.feedback.length ? `<p class="small" style="color:var(--warn)">Past feedback: ${p.feedback.map(fb => `${DEC[fb.decision]} (${esc(fb.roleTitle)}): ${esc(fb.notes)}`).join('; ')}</p>` : ''}</div>`; }).join('')}<div class="acts">${btn('Keep ticked ones and message them','resolve',t.id + '|done','primary')}</div>`; }
+    else if (t.type === 'question') work = `<p class="small">They asked: "${esc(t.q)}"</p><label for="t-note">Your answer (sent as you)</label><textarea id="t-note">${/remote/i.test(t.q) ? 'The design team works 3 days a week in the office and 2 from home. – HireLoop' : 'Yes. Acme covers travel and two weeks of stay for anyone moving to Bengaluru. – HireLoop'}</textarea><div class="acts">${btn('Send answer','resolve',t.id + '|done','primary')}</div>`;
+    else if (t.type === 'receipt' || t.type === 'call') work = `<div class="acts">${btn('Called: all clear','resolve',t.id + '|done','primary')}</div>`;
+    else if (t.type === 'th_missing') work = `<div class="acts">${btn('Extend 3 days','resolve',t.id + '|extend','primary')}${btn('They dropped out','resolve',t.id + '|drop','')}</div>`;
+    else if (t.type === 'resched') work = `<div class="acts">${btn(`Booked: ${fd(S.day + 2)}, 12:00`,'resolve',t.id + '|book','primary')}${btn('They withdrew','resolve',t.id + '|withdrew','')}</div>`;
+    else if (t.type === 'negotiation') work = `<div class="acts">${btn(`Agreed at ${lpa(a.offer.ctc + 2)}`,'resolve',t.id + '|won','primary')}${btn('They declined','resolve',t.id + '|lost','')}</div>`;
+    else if (t.type === 'risk') work = `<div class="acts">${btn('Still joining','resolve',t.id + '|ok','primary')}${btn('Not joining','resolve',t.id + '|lost','')}</div>`;
+    const last = a && a.msgs.length ? a.msgs.filter(m => m.from === 'cand').at(-1) : null;
+    detail = `<section class="panel"><div class="panel-h"><h2>${esc(t.title)}</h2><span class="prio" style="color:${PCOL[pr[0]]}"><i style="background:${PCOL[pr[0]]}"></i>${pr[1]} · ${pr[2]}</span></div><div style="padding:14px 16px">
+      <p class="small muted">${esc(tClient(t))} · ${esc(tRole(t))}${t.cand ? ' · ' + esc(t.cand) : ''}</p>
+      <p style="margin:6px 0 4px">${esc(t.why)}</p>
+      ${a ? `<p class="small">Status: ${waitHTML(a)}</p>` : ''}
+      ${last ? `<p class="small muted" style="margin-top:6px">Their last message: "${esc(last.text)}"</p>` : ''}
+      <div class="suggest"><b>AI suggestion</b>${esc(suggestion(t))}</div>
+      ${work}
+      <div class="row" style="margin-top:14px;align-items:end"><div><label for="re-${t.id}">Assigned to</label><select id="re-${t.id}" data-sel="reassign" data-k="${t.id}">${TEAM.map(n => `<option${n === t.assignee ? ' selected' : ''}>${n}</option>`).join('')}</select></div><div>${a && a.msgs.length ? btn('See the conversation','goPhone',a.id,'sm') : ''}</div></div>
+    </div></section>`;
+  }
+  return `<main>${head('HireLoop recruiter tasks', 'Only the work that needs a person, across every client and every HireLoop recruiter. The AI handles the rest.')}
+  <div class="tiles"><div><b style="color:var(--bad)">${urgent}</b><span>Urgent (within 1 hour)</span></div><div><b>${today}</b><span>Due today</span></div><div><b>${all.length}</b><span>Open tasks</span></div><div><b>${doneToday}</b><span>Done today</span></div></div>
+  <div class="filters">${sel('who','Recruiter',[['All','Everyone']].concat(TEAM.map(n => [n, n])))}${sel('client','Client',[['All','All clients'],['Acme','Acme'],['Northwind','Northwind'],['Brightpath','Brightpath']])}${sel('type','Type',[['All','All types']].concat(Object.entries(TYPE_LABEL)))}${sel('sort','Sort by',[['urgency','Most urgent first'],['oldest','Oldest first'],['client','Client']])}</div>
+  <div class="cockpit" style="padding:0;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)"><section class="panel" style="margin:0">${list.length ? list.map(x => { const pr = PRIO[x.type]; return `<button class="trow" data-a="openTask" data-v="${x.id}" aria-current="${t && t.id === x.id}"><span class="prio" style="color:${PCOL[pr[0]]}"><i style="background:${PCOL[pr[0]]}"></i>${pr[1]}</span><span><b>${esc(x.title)}</b><span class="sub">${esc(tClient(x))} · ${esc(tRole(x))} · ${TYPE_LABEL[x.type]}</span></span><span class="hide-sm small">${esc(x.assignee)}</span><span class="hide-sm small muted">${pr[2]}</span></button>`; }).join('') : '<p class="empty">No tasks match.</p>'}</section><div>${detail}</div></div></main>`;
+}
+
+function guideHTML(){
+  if (!ui.guide) return '';
+  return `<button class="scrim" data-a="guide" aria-label="Close guide"></button><aside class="drawer" role="dialog" aria-label="Demo guide">${btn('Close','guide','','sm xclose')}
+  <h1 style="font-size:22px">Demo guide</h1>
+  <div class="sec"><h3>10-minute script</h3><ol class="script">
+  <li><b>Recruiter 1:</b> clear one to-do (approve Nisha's date). Then New role → keep defaults → Create role.</li>
+  <li>Click <b>Find candidates</b>. One is skipped because they're flagged.</li>
+  <li><b>HireLoop recruiter:</b> filter to Sneha. Do the quality check.</li>
+  <li><b>Candidate:</b> pick Arjun (WhatsApp), reply interested, send answers. Open <b>My HireLoop page</b>.</li>
+  <li><b>Recruiter 1:</b> Send shortlist. <b>Hiring manager:</b> Head of Product, tap Yes, interview.</li>
+  <li><b>Candidate:</b> pick a time. <b>Hiring manager:</b> read the AI brief.</li>
+  <li><b>Recruiter 1:</b> open Arjun → Interview happened. <b>Hiring manager:</b> AI recap → Yes → Submit.</li>
+  <li><b>Candidate:</b> submit the take-home. Repeat for the engineering round (Head of Engineering).</li>
+  <li><b>Recruiter 1:</b> draft offer. <b>Hiring manager:</b> approve. <b>Candidate:</b> accept.</li>
+  <li><b>Head of Talent:</b> compare recruiters, approve Kunal's offer, then Add recruiter and move a role to them.</li>
+  </ol></div>
+  <div class="sec"><h3>Edge cases seen: ${S.edges.length} of 20</h3>${EDGES.map(([n, t, h]) => `<div class="check"><span class="${S.edges.includes(n) ? 'ok' : 'no'}">${S.edges.includes(n) ? '✓' : '○'}</span><div><b>${esc(t)}</b><br><span class="small muted">${esc(h)}</span></div></div>`).join('')}</div></aside>`;
+}
+
+const ICON = {
+  rec:'<svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.6"><rect x="2" y="3" width="12" height="10" rx="2"/><path d="M2 6.5h12"/></svg>',
+  admin:'<svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.6"><path d="M2 13V7m4 6V3m4 10V8m4 5V5"/></svg>',
+  hm:'<svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.6"><path d="M3 3h10v7H7l-3 3v-3H3z"/></svg>',
+  cand:'<svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.6"><rect x="4.5" y="1.5" width="7" height="13" rx="1.5"/><path d="M7 12h2"/></svg>',
+  team:'<svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.6"><circle cx="8" cy="5.5" r="2.5"/><path d="M3 14c.6-2.7 2.6-4 5-4s4.4 1.3 5 4"/></svg>'
+};
+function render(){
+  if (typeof document === 'undefined') return;
+  const app = document.getElementById('app'); if (!app) return;
+  const nAdm = attention('admin').filter(i => i.approval).length;
+  const nSlack = S.inbox.filter(m => !m.done && !m.cancelled).length, nTasks = S.tasks.filter(t => !t.done).length;
+  const nCand = S.apps.filter(a => a.msgs.length && needsReply(a)).length;
+  const seats = Object.entries(RECS).map(([k, x]) => [k, x.name, x.sub, 'rec', 'var(--company)', attention(k).length]).concat([['admin','Head of Talent','Acme · all recruiters','admin','var(--company)',nAdm],['hm','Hiring manager','Slack','hm','var(--hm)',nSlack],['cand','Candidate','Email or WhatsApp','cand','var(--cand)',nCand],['team','HireLoop recruiter','Our team, all clients','team','var(--team)',nTasks]]);
+  const rail = `<aside class="rail"><div class="brand"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7.5" fill="none" stroke="var(--brand)" stroke-width="3" stroke-dasharray="36 12" stroke-linecap="round"/></svg>HireLoop</div>
+  <h4>View as</h4>${seats.map(([k, n, s, ic, c, b]) => `<button class="seat" data-a="persona" data-v="${k}" aria-pressed="${ui.persona === k}"><span class="av" style="background:${c}">${ICON[ic]}</span><span class="lbl"><b>${n}</b><small>${s}</small></span>${b ? `<span class="badge">${b}</span>` : ''}</button>`).join('')}
+  <div class="railfoot"><span class="today">Today<b>${fd(S.day)}</b></span><button class="rbtn go" data-a="advance">Next day</button><button class="rbtn" data-a="guide">Demo guide</button><button class="rbtn" data-a="reset">Reset demo</button></div></aside>`;
+  let body;
+  if (ui.persona === 'hm') body = slackHTML(); else if (ui.persona === 'cand') body = viewCandidate(); else if (ui.persona === 'team') body = viewTeam(); else body = viewPortal();
+  app.innerHTML = `<div class="shell">${rail}<div class="stage">${body}</div></div>` + (portal() ? (ui.drawer ? appDrawer() : personDrawer()) : '') + modalHTML() + guideHTML() + (ui.toast ? `<div class="toast" role="status">${esc(ui.toast)}</div>` : '');
+  document.querySelectorAll('.chat,.mthread').forEach(c => { c.scrollTop = c.scrollHeight; });
+  const feed = document.querySelector('.sfeed');
+  if (feed) { const f = ui.focus && document.getElementById('msg-' + ui.focus); if (f) f.scrollIntoView({block:'nearest'}); else feed.scrollTop = feed.scrollHeight; }
+}
+
+/* ============ Wiring ============ */
+function setPath(o, path, v){ const k = path.split('.'); let t = o; for (let i = 0; i < k.length - 1; i++) t = t[k[i]]; t[k.at(-1)] = v; }
+if (typeof document !== 'undefined') {
+  document.addEventListener('click', e => { const el = e.target.closest('[data-a]'); if (!el || el.disabled) return; const fn = X[el.dataset.a]; if (!fn) return; e.preventDefault(); fn(el.dataset.v, el); render(); });
+  document.addEventListener('change', e => { const el = e.target.closest('[data-sel]'); if (el && X[el.dataset.sel]) { X[el.dataset.sel](el.value, el); render(); } });
+  document.addEventListener('input', e => {
+    const q = e.target.closest('[data-q]');
+    if (q) { ui.q = q.value; const pos = q.selectionStart; render(); const n = document.getElementById('cand-q'); if (n) { n.focus(); n.setSelectionRange(pos, pos); } return; }
+    const el = e.target.closest('[data-w]'); if (!el || !ui.wiz) return;
+    const num = ['seats','min','max','maxNotice','targetDays'].includes(el.dataset.w);
+    setPath(ui.wiz.d, el.dataset.w, num ? Number(el.value) : el.value);
+    if (el.dataset.w === 'tpl') { ui.wiz.d.stages = clone(TEMPLATES[el.value].stages); if (el.value === 'custom') ui.wiz.d.stages[0].by = ui.wiz.d.hm; }
+    if (el.dataset.rr) render();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && (ui.drawer || ui.pdrawer || ui.modal || ui.guide)) { ui.drawer = null; ui.pdrawer = null; ui.modal = null; ui.wiz = null; ui.guide = false; render(); } });
+}
+seed(); resetUI(); render();
+if (typeof module !== 'undefined') module.exports = {X, get S(){return S;}, get ui(){return ui;}, A, P, R, attention, candOpts, viewHome, viewOverview, viewRole, viewRoles, viewCandidates, slackHTML, viewCandidate, viewTeam, appDrawer, personDrawer, modalHTML, guideHTML, wizardHTML, myPage, setUi:(k, v) => { ui[k] = v; }};
+
+</script>
+</body>
+</html>
